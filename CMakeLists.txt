@@ -17,6 +17,9 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS /utf-8)
 endif()
 
+# 确保调试和发布版本对将安装的可执行文件和库使用不同的名称。让我们使用 d 作为调试可执行文件和库的后缀。
+set(CMAKE_DEBUG_POSTFIX d)
+
 # VTK
 find_package(VTK COMPONENTS
     vtkCommonCore
@@ -75,6 +78,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${VTK_LIBRARIES})
 # 链接 HALCON
 target_link_libraries(${PROJECT_NAME} PRIVATE halconcpp.lib halcon.lib)
+
+# 可执行文件上的 DEBUG_POSTFIX 属性
+set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

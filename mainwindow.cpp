@@ -243,7 +243,7 @@ void MainWindow::initVTK()
 
     // 创建渲染窗口
     renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-    renderWindow->AddRenderer(renderer); // 设置渲染器
+    renderWindow->AddRenderer(renderer); // 将渲染器添加到渲染窗口中
 //    renderWindow->SetSize(800, 600); // 设置渲染窗口的大小为 800x600
 
     // 创建交互器
@@ -375,7 +375,7 @@ void MainWindow::showDefaultWindow()
 
     // 创建渲染窗口
     vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-    renderWindow->AddRenderer(renderer); // 设置渲染器
+    renderWindow->AddRenderer(renderer); // 将渲染器添加到渲染窗口中
     renderWindow->SetSize(800, 600); // 设置渲染窗口的大小为 800x600
 
     // 创建交互器
@@ -477,7 +477,7 @@ void MainWindow::showVTKWidget()
 
     // 创建渲染窗口
     vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-    renderWindow->AddRenderer(renderer); // 设置渲染器
+    renderWindow->AddRenderer(renderer); // 将渲染器添加到渲染窗口中
 //    renderWindow->SetSize(800, 600); // 设置渲染窗口的大小为 800x600
 
     // 创建交互器
