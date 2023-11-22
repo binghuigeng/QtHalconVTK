@@ -11,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     initVTK(); // 初始化VTK
+
+    this->setWindowTitle("点云编辑器 - guchi");
 }
 
 MainWindow::~MainWindow()
@@ -22,7 +24,7 @@ void MainWindow::on_actOpen_triggered()
 {
     // 选择 .ply 文件
     QString filename = QFileDialog::getOpenFileName(
-                nullptr, "选择 .ply 文件", "", "*.ply");
+                this, "打开文件", "", "点云文件 (*.ply)");
 
     if (!filename.isEmpty()) {
         if (loadPointCloudFile(filename))

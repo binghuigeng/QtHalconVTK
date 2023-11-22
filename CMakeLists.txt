@@ -20,6 +20,11 @@ endif()
 # 确保调试和发布版本对将安装的可执行文件和库使用不同的名称。让我们使用 d 作为调试可执行文件和库的后缀。
 set(CMAKE_DEBUG_POSTFIX d)
 
+# 在 Windows 上设置应用程序图标
+if(WIN32)
+    set(APP_ICON_RESOURCE_WINDOWS ${CMAKE_SOURCE_DIR}/Resource/App/myApp.rc)
+endif()
+
 # VTK
 find_package(VTK COMPONENTS
     vtkCommonCore
@@ -48,6 +53,7 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        Resource/Image/image.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -69,6 +75,7 @@ else()
     else()
         add_executable(${PROJECT_NAME}
             ${PROJECT_SOURCES}
+            ${APP_ICON_RESOURCE_WINDOWS}
         )
     endif()
 endif()

@@ -53,6 +53,10 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actOpen">
+   <property name="icon">
+    <iconset resource="Resource/Image/image.qrc">
+     <normaloff>:/Action/file.png</normaloff>:/Action/file.png</iconset>
+   </property>
    <property name="text">
     <string>打开文件</string>
    </property>
@@ -80,6 +84,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="Resource/Image/image.qrc"/>
+ </resources>
  <connections/>
 </ui>

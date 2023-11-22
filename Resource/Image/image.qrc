@@ -1,0 +1,38 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Action/20.ico</file>
+        <file>Action/103.bmp</file>
+        <file>Action/120.bmp</file>
+        <file>Action/430.bmp</file>
+        <file>Action/BLD.BMP</file>
+        <file>Action/cut.bmp</file>
+        <file>Action/DBLUNDR.BMP</file>
+        <file>Action/exit.bmp</file>
+        <file>Action/file.png</file>
+        <file>Action/folder.png</file>
+        <file>Action/ITL.BMP</file>
+        <file>Action/new2.bmp</file>
+        <file>Action/open3.bmp</file>
+        <file>Action/paste.bmp</file>
+        <file>Action/UNDRLN.BMP</file>
+        <file>Action/WORDUNDR.BMP</file>
+        <file>Dialog/qmessagebox-crit.png</file>
+        <file>Dialog/qmessagebox-info.png</file>
+        <file>Dialog/qmessagebox-quest.png</file>
+        <file>Dialog/qmessagebox-warn.png</file>
+        <file>Glossy/blue.png</file>
+        <file>Glossy/gray.png</file>
+        <file>Glossy/green.png</file>
+        <file>Glossy/orange.png</file>
+        <file>Glossy/red.png</file>
+        <file>Glossy/white.png</file>
+        <file>Glossy/yellow.png</file>
+        <file>Light/blue.png</file>
+        <file>Light/green.png</file>
+        <file>Light/orange.png</file>
+        <file>Light/purple.png</file>
+        <file>Light/red.png</file>
+        <file>Light/white.png</file>
+        <file>Light/yellow.png</file>
+    </qresource>
+</RCC>
