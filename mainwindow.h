@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLabel>
 
 // HALCON headers
 #include "HalconCpp.h"
@@ -59,6 +60,9 @@ private:
     /// @brief 初始化 VTK
     void initVTK();
 
+    /// @brief 初始化状态栏显示消息
+    void initStatusbarMessage();
+
 #if 0
     /// @brief 默认渲染窗口显示点云
     void showDefaultWindow();
@@ -69,6 +73,7 @@ private:
 
 private:
     Ui::MainWindow *ui;
+    QLabel *statusLabel; //状态栏消息标签
 
     // HALCON variables
     HalconCpp::HObjectModel3D model3D;

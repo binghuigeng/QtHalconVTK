@@ -3,6 +3,7 @@
 
 #include <QFileDialog>
 #include <QDebug>
+#include <QDate>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,7 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     initVTK(); // 初始化VTK
 
-    this->setWindowTitle("点云编辑器 - guchi");
+    this->setWindowTitle("点云编辑器 - guchi"); // 设置窗口标题
+
+    initStatusbarMessage(); // 初始化状态栏显示消息
 }
 
 MainWindow::~MainWindow()
@@ -249,7 +252,7 @@ void MainWindow::initVTK()
 //    renderWindow->SetSize(800, 600); // 设置渲染窗口的大小为 800x600
 
     // 创建交互器
-    renderWindowInteractor = new QVTKOpenGLWidget();
+    renderWindowInteractor = new QVTKOpenGLWidget(this);
     renderWindowInteractor->SetRenderWindow(renderWindow); // 设置渲染窗口
 
     // 创建交互器样式
@@ -262,6 +265,20 @@ void MainWindow::initVTK()
 
     // 添加到布局中
     ui->verticalLayout->addWidget(renderWindowInteractor);
+}
+
+void MainWindow::initStatusbarMessage()
+{
+//    ui->statusbar->showMessage(tr("Ready"));
+
+    // 创建一个标签并设置居中对齐
+    statusLabel = new QLabel(this);
+    statusLabel->setAlignment(Qt::AlignCenter);
+    statusLabel->setText("<a href=\"https://www.baidu.com\" style=\"text-decoration: none; color: #000000;\">Copyright 2022-2023 The guchi Company Ltd. All rights reserved.</a>");
+    statusLabel->setOpenExternalLinks(true);
+
+    // 将标签添加到状态栏，并设置其占用状态栏的比例为1
+    ui->statusbar->addWidget(statusLabel, 1);
 }
 
 #if 0
