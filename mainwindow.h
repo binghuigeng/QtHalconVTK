@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QLabel>
 
+#include "aboutdialog.h"
+
 // HALCON headers
 #include "HalconCpp.h"
 
@@ -35,12 +37,22 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    /// @brief // 重写窗口的关闭事件处理
+    void closeEvent(QCloseEvent *event) override;
+
 private slots:
-    void on_actOpen_triggered();
+    /// @brief 打开文件
+    void slt_actOpen_triggered();
 
-    void on_actReset_triggered();
+    /// @brief 重置
+    void slt_actReset_triggered();
 
-    void on_actAdd_triggered();
+    /// @brief 添加
+    void slt_actAdd_triggered();
+
+    /// @brief 关于
+    void slt_actAbout_triggered();
 
 private:
     /// @brief 加载点云文件
@@ -63,6 +75,9 @@ private:
     /// @brief 初始化状态栏显示消息
     void initStatusbarMessage();
 
+    /// @brief 初始化信号与槽函数
+    void initSignalsAndSlots();
+
 #if 0
     /// @brief 默认渲染窗口显示点云
     void showDefaultWindow();
@@ -73,7 +88,12 @@ private:
 
 private:
     Ui::MainWindow *ui;
-    QLabel *statusLabel; //状态栏消息标签
+
+    /// @brief 状态栏消息标签
+    QLabel *statusLabel;
+
+    /// @brief 关于对话框
+    AboutDialog dlgAbout;
 
     // HALCON variables
     HalconCpp::HObjectModel3D model3D;

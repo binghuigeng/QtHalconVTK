@@ -1,9 +1,10 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+#include <QCloseEvent>
+#include <QMessageBox>
 #include <QFileDialog>
 #include <QDebug>
-#include <QDate>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -11,11 +12,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    initVTK(); // 初始化VTK
-
     this->setWindowTitle("点云编辑器 - guchi"); // 设置窗口标题
 
     initStatusbarMessage(); // 初始化状态栏显示消息
+    initSignalsAndSlots(); // 初始化信号与槽函数
+    initVTK(); // 初始化VTK
 }
 
 MainWindow::~MainWindow()
@@ -23,7 +24,43 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_actOpen_triggered()
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    // 关闭关于对话框
+    if (dlgAbout.isVisible()) {
+        dlgAbout.close();
+    }
+
+#if 0
+    // 弹出确认对话框
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "this->windowTitle()",
+                                                                tr("Are you sure you want to close?\n"),
+                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (resBtn != QMessageBox::Yes) {
+        event->ignore(); // 忽略关闭事件
+    } else {
+        event->accept(); // 接受关闭事件
+    }
+#endif
+
+    // 创建一个非模态对话框
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(this->windowTitle());
+    msgBox.setText("Are you sure you want to close?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::No);
+    msgBox.setIcon(QMessageBox::Question);
+
+    // 显示对话框，并在用户点击确认按钮时关闭窗口
+    if (msgBox.exec() == QMessageBox::Yes) {
+        event->accept(); // 接受关闭事件
+    } else {
+        event->ignore(); // 忽略关闭事件
+    }
+}
+
+void MainWindow::slt_actOpen_triggered()
 {
     // 选择 .ply 文件
     QString filename = QFileDialog::getOpenFileName(
@@ -40,7 +77,7 @@ void MainWindow::on_actOpen_triggered()
     }
 }
 
-void MainWindow::on_actReset_triggered()
+void MainWindow::slt_actReset_triggered()
 {
     // 清空插入的点
     points->Reset();
@@ -49,7 +86,7 @@ void MainWindow::on_actReset_triggered()
     renderWindow->Render();
 }
 
-void MainWindow::on_actAdd_triggered()
+void MainWindow::slt_actAdd_triggered()
 {
     // 清空插入的点
     points->Reset();
@@ -88,6 +125,15 @@ void MainWindow::on_actAdd_triggered()
 
     // 刷新渲染窗口以显示新的点云数据
     renderWindow->Render();
+}
+
+void MainWindow::slt_actAbout_triggered()
+{
+    // 关于对话框
+    if (!dlgAbout.isVisible()) {
+        dlgAbout.show(); //非模态显示对话框
+        dlgAbout.setDefaultButton(); //设置默认按钮
+    }
 }
 
 bool MainWindow::loadPointCloudFile(QString fileName)
@@ -279,6 +325,15 @@ void MainWindow::initStatusbarMessage()
 
     // 将标签添加到状态栏，并设置其占用状态栏的比例为1
     ui->statusbar->addWidget(statusLabel, 1);
+}
+
+void MainWindow::initSignalsAndSlots()
+{
+    // QAction 项对应的槽
+    connect(ui->actOpen, &QAction::triggered, this, &MainWindow::slt_actOpen_triggered);
+    connect(ui->actReset, &QAction::triggered, this, &MainWindow::slt_actReset_triggered);
+    connect(ui->actAdd, &QAction::triggered, this, &MainWindow::slt_actAdd_triggered);
+    connect(ui->actAbout, &QAction::triggered, this, &MainWindow::slt_actAbout_triggered);
 }
 
 #if 0

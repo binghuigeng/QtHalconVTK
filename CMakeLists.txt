@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(qtHalconVTK VERSION 0.1 LANGUAGES CXX)
+project(QtHalconVTK VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -25,6 +25,9 @@ if(WIN32)
     set(APP_ICON_RESOURCE_WINDOWS ${CMAKE_SOURCE_DIR}/Resource/App/myApp.rc)
 endif()
 
+# 配置头文件以将一些 CMake 设置传递给源代码
+configure_file(${CMAKE_SOURCE_DIR}/Config/ProjectConfig.h.in ProjectConfig.h)
+
 # VTK
 find_package(VTK COMPONENTS
     vtkCommonCore
@@ -47,6 +50,9 @@ link_directories(D:/MVTec/HALCON-21.11-Progress/lib/x64-win64)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+
+# 添加子目录
+add_subdirectory(CustomizeDialog)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -85,6 +91,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${VTK_LIBRARIES})
 # 链接 HALCON
 target_link_libraries(${PROJECT_NAME} PRIVATE halconcpp.lib halcon.lib)
+# 链接自定义对话框
+target_link_libraries(${PROJECT_NAME} PUBLIC CustomizeDialog)
+
+# 将二进制文件目录添加到包含文件的搜索路径中，以便我们找到 ProjectConfig.h
+target_include_directories(${PROJECT_NAME} PUBLIC
+                           "${PROJECT_BINARY_DIR}"
+                           )
 
 # 可执行文件上的 DEBUG_POSTFIX 属性
 set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})

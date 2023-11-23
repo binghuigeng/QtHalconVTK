@@ -1,0 +1,23 @@
+#ifndef INCLUDE_GUARD
+#define INCLUDE_GUARD
+
+/******************************************************************************************
+** 将宏展开为字符串
+** 
+** 要将宏定义的PROJECT_VERSION转换为字符串，您可以使用C++的预处理器操作符#
+** 我们定义了两个宏STRINGIFY和TOSTRING。
+** STRINGIFY宏将其参数转换为字符串，而TOSTRING宏则使用STRINGIFY宏将宏定义的值转换为字符串
+** 注意，这种转换是在预处理阶段进行的，因此转换后的字符串将在编译时期被使用
+******************************************************************************************/
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
+// 工程的配置选项和设置
+#define PROJECT_NAME @PROJECT_NAME@
+#define PROJECT_VERSION @PROJECT_VERSION@
+#define PROJECT_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define PROJECT_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define PROJECT_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#define PROJECT_VERSION_TWEAK @PROJECT_VERSION_TWEAK@
+
+#endif // INCLUDE_GUARD
