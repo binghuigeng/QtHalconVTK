@@ -2,7 +2,6 @@
 #include "./ui_mainwindow.h"
 
 #include <QCloseEvent>
-#include <QMessageBox>
 #include <QFileDialog>
 #include <QDebug>
 
@@ -14,9 +13,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setWindowTitle("点云编辑器 - guchi"); // 设置窗口标题
 
+    initCloseWindow(); // 初始化关闭窗口
     initStatusbarMessage(); // 初始化状态栏显示消息
-    initSignalsAndSlots(); // 初始化信号与槽函数
     initVTK(); // 初始化VTK
+    initSignalsAndSlots(); // 初始化信号与槽函数
 }
 
 MainWindow::~MainWindow()
@@ -32,8 +32,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 
 #if 0
-    // 弹出确认对话框
-    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "this->windowTitle()",
+    // 基于静态函数创建消息对话框
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, this->windowTitle(),
                                                                 tr("Are you sure you want to close?\n"),
                                                                 QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::Yes);
@@ -44,7 +44,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 #endif
 
-    // 创建一个非模态对话框
+#if 0
+    // 基于属性的 API 创建消息对话框
     QMessageBox msgBox;
     msgBox.setWindowTitle(this->windowTitle());
     msgBox.setText("Are you sure you want to close?");
@@ -57,6 +58,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->accept(); // 接受关闭事件
     } else {
         event->ignore(); // 忽略关闭事件
+    }
+#endif
+
+    QApplication::setActiveWindow(&msgBox); // 将指定窗口设置为活动窗口并将焦点设置到该窗口
+    if (msgBox.isVisible() && bAcceptClose) {
+        if (bAcceptClose) {
+            event->accept(); // 接受关闭事件
+        }
+    } else {
+        event->ignore(); // 忽略关闭事件
+        msgBox.show();
     }
 }
 
@@ -134,6 +146,129 @@ void MainWindow::slt_actAbout_triggered()
         dlgAbout.show(); //非模态显示对话框
         dlgAbout.setDefaultButton(); //设置默认按钮
     }
+}
+
+void MainWindow::slt_actGeneral_triggered()
+{
+
+}
+
+void MainWindow::buttonClicked(QAbstractButton *butClicked)
+{
+    if(butClicked == (QAbstractButton*)btnAccept){
+        bAcceptClose = true;
+        this->close();
+    } else if (butClicked == (QAbstractButton*)btnReject) {
+//        this->close();
+    }
+}
+
+void MainWindow::initCloseWindow()
+{
+    msgBox.setWindowTitle(this->windowTitle()); // 设置消息对话框的标题
+    msgBox.setText("您确定要关闭吗？"); // 设置消息对话框的具体内容
+    msgBox.setIcon(QMessageBox::Question); // 设置消息对话框的图标
+    // 自定义两个按钮
+    btnAccept = msgBox.addButton("是(Y)", QMessageBox::AcceptRole); // 使用给定文本创建一个按钮，将其添加到指定角色的消息框中
+    btnReject = msgBox.addButton("否(N)", QMessageBox::RejectRole); // 使用给定文本创建一个按钮，将其添加到指定角色的消息框中
+    msgBox.setDefaultButton(btnAccept); // 设置消息对话框的默认按钮，即按下回车键会触发的按钮
+    checkBox = new QCheckBox("不再询问", &msgBox);
+    msgBox.setCheckBox(checkBox); // 设置消息对话框的复选框
+    /********************************************************************************
+    ** @brief 设置窗口的模态性与设置窗口的标志执行顺序不能互换，否则会引发一连串问题
+    **
+    ** 1. 窗口置顶：初次启动窗口置顶生效，点击其他窗口窗口置顶失效
+    ** 2. 窗口标志：标题栏会显示 Dialog 的 ? 按钮
+    ********************************************************************************/
+    msgBox.setWindowModality(Qt::NonModal); // 设置消息对话框的模态 -> 非模态
+    msgBox.setWindowFlags(Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint); // 设置消息对话框的标志 -> 显示关闭按钮窗口置顶
+}
+
+void MainWindow::initStatusbarMessage()
+{
+//    ui->statusbar->showMessage(tr("Ready"));
+
+    // 创建一个标签并设置居中对齐
+    statusLabel = new QLabel(this);
+    statusLabel->setAlignment(Qt::AlignCenter);
+    statusLabel->setText("<a href=\"https://www.baidu.com\" style=\"text-decoration: none; color: #000000;\">Copyright 2022-2023 The guchi Company Ltd. All rights reserved.</a>");
+    statusLabel->setOpenExternalLinks(true);
+
+    // 将标签添加到状态栏，并设置其占用状态栏的比例为1
+    ui->statusbar->addWidget(statusLabel, 1);
+}
+
+void MainWindow::initVTK()
+{
+    // 创建点云数据
+    points = vtkSmartPointer<vtkPoints>::New();
+//    points->InsertNextPoint(0, 0, 0); // 添加点坐标
+//    points->InsertNextPoint(1, 0, 0);
+//    points->InsertNextPoint(0, 1, 0);
+//    points->InsertNextPoint(1, 1, 1);
+
+    // 创建顶点
+    vertices = vtkSmartPointer<vtkCellArray>::New();
+//    for (int i = 0; i < points->GetNumberOfPoints(); i++)
+//    {
+//        vertices->InsertNextCell(1);
+//        vertices->InsertCellPoint(i);
+//    }
+
+    // 创建多边形数据
+    polyData = vtkSmartPointer<vtkPolyData>::New();
+    polyData->SetPoints(points);
+    polyData->SetVerts(vertices);
+
+    // 创建顶点滤波器
+    vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+    vertexFilter->SetInputData(polyData);
+
+    // 创建点云映射器
+    mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputConnection(vertexFilter->GetOutputPort());
+
+    // 创建点云演员
+    actor = vtkSmartPointer<vtkActor>::New();
+    actor->SetMapper(mapper);
+//    actor->GetProperty()->SetPointSize(5);
+
+    // 创建渲染器
+    renderer = vtkSmartPointer<vtkRenderer>::New();
+    renderer->AddActor(actor);
+    renderer->SetBackground(0.1, 0.2, 0.4); // 设置渲染器背景颜色
+
+    // 创建渲染窗口
+    renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+    renderWindow->AddRenderer(renderer); // 将渲染器添加到渲染窗口中
+//    renderWindow->SetSize(800, 600); // 设置渲染窗口的大小为 800x600
+
+    // 创建交互器
+    renderWindowInteractor = new QVTKOpenGLWidget(this);
+    renderWindowInteractor->SetRenderWindow(renderWindow); // 设置渲染窗口
+
+    // 创建交互器样式
+    style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+    renderWindowInteractor->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
+
+    // 开启渲染和交互
+    renderWindow->Render();
+//    renderWindowInteractor->Start();
+
+    // 添加到布局中
+    ui->verticalLayout->addWidget(renderWindowInteractor);
+}
+
+void MainWindow::initSignalsAndSlots()
+{
+    // QAction 项对应的槽
+    connect(ui->actOpen, &QAction::triggered, this, &MainWindow::slt_actOpen_triggered);
+    connect(ui->actReset, &QAction::triggered, this, &MainWindow::slt_actReset_triggered);
+    connect(ui->actAdd, &QAction::triggered, this, &MainWindow::slt_actAdd_triggered);
+    connect(ui->actGeneral, &QAction::triggered, this, &MainWindow::slt_actGeneral_triggered);
+    connect(ui->actAbout, &QAction::triggered, this, &MainWindow::slt_actAbout_triggered);
+    // 连接信号与槽，监听用户点击的按钮，如果用户同意关闭，则程序退出
+    connect(&msgBox, &QMessageBox::buttonClicked, this, &MainWindow::buttonClicked);
 }
 
 bool MainWindow::loadPointCloudFile(QString fileName)
@@ -250,90 +385,6 @@ void MainWindow::showPointCloud()
 
     // 刷新渲染窗口以显示新的点云数据
     renderWindow->Render();
-}
-
-void MainWindow::initVTK()
-{
-    // 创建点云数据
-    points = vtkSmartPointer<vtkPoints>::New();
-//    points->InsertNextPoint(0, 0, 0); // 添加点坐标
-//    points->InsertNextPoint(1, 0, 0);
-//    points->InsertNextPoint(0, 1, 0);
-//    points->InsertNextPoint(1, 1, 1);
-
-    // 创建顶点
-    vertices = vtkSmartPointer<vtkCellArray>::New();
-//    for (int i = 0; i < points->GetNumberOfPoints(); i++)
-//    {
-//        vertices->InsertNextCell(1);
-//        vertices->InsertCellPoint(i);
-//    }
-
-    // 创建多边形数据
-    polyData = vtkSmartPointer<vtkPolyData>::New();
-    polyData->SetPoints(points);
-    polyData->SetVerts(vertices);
-
-    // 创建顶点滤波器
-    vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
-    vertexFilter->SetInputData(polyData);
-
-    // 创建点云映射器
-    mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection(vertexFilter->GetOutputPort());
-
-    // 创建点云演员
-    actor = vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
-//    actor->GetProperty()->SetPointSize(5);
-
-    // 创建渲染器
-    renderer = vtkSmartPointer<vtkRenderer>::New();
-    renderer->AddActor(actor);
-    renderer->SetBackground(0.1, 0.2, 0.4); // 设置渲染器背景颜色
-
-    // 创建渲染窗口
-    renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-    renderWindow->AddRenderer(renderer); // 将渲染器添加到渲染窗口中
-//    renderWindow->SetSize(800, 600); // 设置渲染窗口的大小为 800x600
-
-    // 创建交互器
-    renderWindowInteractor = new QVTKOpenGLWidget(this);
-    renderWindowInteractor->SetRenderWindow(renderWindow); // 设置渲染窗口
-
-    // 创建交互器样式
-    style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-    renderWindowInteractor->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
-
-    // 开启渲染和交互
-    renderWindow->Render();
-//    renderWindowInteractor->Start();
-
-    // 添加到布局中
-    ui->verticalLayout->addWidget(renderWindowInteractor);
-}
-
-void MainWindow::initStatusbarMessage()
-{
-//    ui->statusbar->showMessage(tr("Ready"));
-
-    // 创建一个标签并设置居中对齐
-    statusLabel = new QLabel(this);
-    statusLabel->setAlignment(Qt::AlignCenter);
-    statusLabel->setText("<a href=\"https://www.baidu.com\" style=\"text-decoration: none; color: #000000;\">Copyright 2022-2023 The guchi Company Ltd. All rights reserved.</a>");
-    statusLabel->setOpenExternalLinks(true);
-
-    // 将标签添加到状态栏，并设置其占用状态栏的比例为1
-    ui->statusbar->addWidget(statusLabel, 1);
-}
-
-void MainWindow::initSignalsAndSlots()
-{
-    // QAction 项对应的槽
-    connect(ui->actOpen, &QAction::triggered, this, &MainWindow::slt_actOpen_triggered);
-    connect(ui->actReset, &QAction::triggered, this, &MainWindow::slt_actReset_triggered);
-    connect(ui->actAdd, &QAction::triggered, this, &MainWindow::slt_actAdd_triggered);
-    connect(ui->actAbout, &QAction::triggered, this, &MainWindow::slt_actAbout_triggered);
 }
 
 #if 0

@@ -3,6 +3,10 @@
 
 #include <QMainWindow>
 #include <QLabel>
+#include <QMessageBox>
+#include <QAbstractButton>
+#include <QPushButton>
+#include <QCheckBox>
 
 #include "aboutdialog.h"
 
@@ -51,10 +55,27 @@ private slots:
     /// @brief 添加
     void slt_actAdd_triggered();
 
+    /// @brief 通用
+    void slt_actGeneral_triggered();
+
     /// @brief 关于
     void slt_actAbout_triggered();
 
+    void buttonClicked(QAbstractButton * butClicked);
+
 private:
+    /// @brief 初始化关闭窗口
+    void initCloseWindow();
+
+    /// @brief 初始化状态栏显示消息
+    void initStatusbarMessage();
+
+    /// @brief 初始化 VTK
+    void initVTK();
+
+    /// @brief 初始化信号与槽函数
+    void initSignalsAndSlots();
+
     /// @brief 加载点云文件
     /// @return true:成功 false:失败
     bool loadPointCloudFile(QString fileName);
@@ -68,15 +89,6 @@ private:
 
     /// @brief 显示点云
     void showPointCloud();
-
-    /// @brief 初始化 VTK
-    void initVTK();
-
-    /// @brief 初始化状态栏显示消息
-    void initStatusbarMessage();
-
-    /// @brief 初始化信号与槽函数
-    void initSignalsAndSlots();
 
 #if 0
     /// @brief 默认渲染窗口显示点云
@@ -94,6 +106,12 @@ private:
 
     /// @brief 关于对话框
     AboutDialog dlgAbout;
+
+    QMessageBox msgBox;
+    QPushButton* btnAccept;
+    QPushButton* btnReject;
+    QCheckBox *checkBox;
+    bool bAcceptClose = false;
 
     // HALCON variables
     HalconCpp::HObjectModel3D model3D;
