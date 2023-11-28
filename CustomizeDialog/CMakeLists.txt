@@ -1,5 +1,6 @@
 add_subdirectory(AboutDialog)
 add_subdirectory(CommonDialog)
+add_subdirectory(SetDialog)
 
 add_library(CustomizeDialog)
 
@@ -7,6 +8,10 @@ add_library(CustomizeDialog)
 target_include_directories(CustomizeDialog INTERFACE
                            ${CMAKE_CURRENT_SOURCE_DIR}/AboutDialog
                            ${CMAKE_CURRENT_SOURCE_DIR}/CommonDialog
+                           ${CMAKE_CURRENT_SOURCE_DIR}/SetDialog
                            )
 
-target_link_libraries(CustomizeDialog PRIVATE AboutDialog CommonDialog)
+target_link_libraries(CustomizeDialog PRIVATE
+    AboutDialog
+    CommonDialog
+    SetDialog)

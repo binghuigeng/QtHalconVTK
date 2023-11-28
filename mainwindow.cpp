@@ -11,8 +11,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // 设置窗口标志位
+    if (SysConfig::getWindowTop()) {
+        this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint); // 窗口置顶
+    }
     this->setWindowTitle("点云编辑器 - guchi"); // 设置窗口标题
 
+    initSysConfig(); // 初始化配置
     initCloseWindow(); // 初始化关闭窗口
     initStatusbarMessage(); // 初始化状态栏显示消息
     initVTK(); // 初始化VTK
@@ -26,11 +31,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    // 关闭关于对话框
-    if (dlgAbout.isVisible()) {
-        dlgAbout.close();
-    }
-
 #if 0
     // 基于静态函数创建消息对话框
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, this->windowTitle(),
@@ -61,15 +61,79 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 #endif
 
-    QApplication::setActiveWindow(&msgBox); // 将指定窗口设置为活动窗口并将焦点设置到该窗口
-    if (msgBox.isVisible() && bAcceptClose) {
-        if (bAcceptClose) {
-            event->accept(); // 接受关闭事件
+    if (SysConfig::getWindowClose()) {
+        QApplication::setActiveWindow(&msgBox); // 将指定窗口设置为活动窗口并将焦点设置到该窗口
+        if (msgBox.isVisible() && bAcceptClose) {
+            if (bAcceptClose) {
+                // 关闭关于对话框
+                if (dlgAbout.isVisible()) {
+                    dlgAbout.close();
+                }
+
+                // 关闭设置对话框
+                if (dlgSet.isVisible()) {
+                    dlgSet.close();
+                }
+
+                event->accept(); // 接受关闭事件
+            }
+        } else {
+            event->ignore(); // 忽略关闭事件
+            msgBox.show();
         }
     } else {
-        event->ignore(); // 忽略关闭事件
-        msgBox.show();
+        // 关闭关于对话框
+        if (dlgAbout.isVisible()) {
+            dlgAbout.close();
+        }
+
+        // 关闭设置对话框
+        if (dlgSet.isVisible()) {
+            dlgSet.close();
+        }
+
+        event->accept(); // 接受关闭事件
     }
+}
+
+void MainWindow::sltWindowOnTop()
+{
+    // 设置窗口标志位 隐藏窗口的最小化和最大化按钮，以及窗口置顶
+    if (this->windowFlags() & Qt::WindowStaysOnTopHint) {
+        this->setWindowFlags(this->windowFlags() & ~Qt::WindowStaysOnTopHint); // 取消窗口置顶
+    } else {
+        this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint); // 窗口置顶
+    }
+    this->show(); // 重新显示窗口
+
+//    // 设置窗口标志位 隐藏窗口的最小化和最大化按钮，以及窗口置顶
+//    Qt::WindowFlags flags = this->windowFlags(); // 获取窗口标志位
+//    if (enable) {
+//        this->setWindowFlags(flags | Qt::WindowStaysOnTopHint); // 窗口置顶
+//    } else {
+//        this->setWindowFlags(flags & ~Qt::WindowStaysOnTopHint); // 取消窗口置顶
+//    }
+//    this->show(); // 重新显示窗口
+}
+
+void MainWindow::sltRendererBackground(SysConfig::RendererBackground index)
+{
+    // 设置渲染器背景颜色
+    switch (index) {
+    case SysConfig::Default:
+        renderer->SetBackground(0.1, 0.2, 0.4); // 深蓝色
+        break;
+    case SysConfig::Black:
+        renderer->SetBackground(0.0, 0.0, 0.0); // 黑色
+        break;
+    case SysConfig::Gray:
+        renderer->SetBackground(0.5, 0.5, 0.5); // 灰色
+        break;
+    default:
+        renderer->SetBackground(0.1, 0.2, 0.4); // 深蓝色
+        break;
+    }
+    renderWindow->Render(); // 刷新渲染窗口
 }
 
 void MainWindow::slt_actOpen_triggered()
@@ -150,7 +214,11 @@ void MainWindow::slt_actAbout_triggered()
 
 void MainWindow::slt_actGeneral_triggered()
 {
-
+    // 设置对话框
+    if (!dlgSet.isVisible()) {
+        dlgSet.show(); //非模态显示对话框
+        dlgSet.setDefaultButton(); //设置默认按钮
+    }
 }
 
 void MainWindow::buttonClicked(QAbstractButton *butClicked)
@@ -163,8 +231,25 @@ void MainWindow::buttonClicked(QAbstractButton *butClicked)
     }
 }
 
+void MainWindow::slt_chkInquiry_stateChanged(int state)
+{
+    if (state == Qt::Checked) {
+        SysConfig::setWindowClose(false);
+        dlgSet.setWidgetContent(false);
+    } else if (state == Qt::Unchecked) {
+        SysConfig::setWindowClose(true);
+        dlgSet.setWidgetContent(true);
+    }
+}
+
+void MainWindow::initSysConfig()
+{
+    dlgSet.setControlShow(SysConfig::getWindowTop(), SysConfig::getWindowClose(), SysConfig::getRendererBackground());
+}
+
 void MainWindow::initCloseWindow()
 {
+    bAcceptClose = false;
     msgBox.setWindowTitle(this->windowTitle()); // 设置消息对话框的标题
     msgBox.setText("您确定要关闭吗？"); // 设置消息对话框的具体内容
     msgBox.setIcon(QMessageBox::Question); // 设置消息对话框的图标
@@ -172,8 +257,9 @@ void MainWindow::initCloseWindow()
     btnAccept = msgBox.addButton("是(Y)", QMessageBox::AcceptRole); // 使用给定文本创建一个按钮，将其添加到指定角色的消息框中
     btnReject = msgBox.addButton("否(N)", QMessageBox::RejectRole); // 使用给定文本创建一个按钮，将其添加到指定角色的消息框中
     msgBox.setDefaultButton(btnAccept); // 设置消息对话框的默认按钮，即按下回车键会触发的按钮
-    checkBox = new QCheckBox("不再询问", &msgBox);
-    msgBox.setCheckBox(checkBox); // 设置消息对话框的复选框
+//    chkInquiry = new QCheckBox("不再询问", &msgBox);
+    chkInquiry.setText("不再询问");
+    msgBox.setCheckBox(&chkInquiry); // 设置消息对话框的复选框
     /********************************************************************************
     ** @brief 设置窗口的模态性与设置窗口的标志执行顺序不能互换，否则会引发一连串问题
     **
@@ -236,7 +322,8 @@ void MainWindow::initVTK()
     // 创建渲染器
     renderer = vtkSmartPointer<vtkRenderer>::New();
     renderer->AddActor(actor);
-    renderer->SetBackground(0.1, 0.2, 0.4); // 设置渲染器背景颜色
+//    renderer->SetBackground(0.1, 0.2, 0.4); // 设置渲染器背景颜色
+    setRendererBackground(SysConfig::getRendererBackground()); // 依据配置文件设置渲染器背景颜色
 
     // 创建渲染窗口
     renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
@@ -269,6 +356,30 @@ void MainWindow::initSignalsAndSlots()
     connect(ui->actAbout, &QAction::triggered, this, &MainWindow::slt_actAbout_triggered);
     // 连接信号与槽，监听用户点击的按钮，如果用户同意关闭，则程序退出
     connect(&msgBox, &QMessageBox::buttonClicked, this, &MainWindow::buttonClicked);
+    // 窗口询问改变
+    connect(&chkInquiry, &QCheckBox::stateChanged, this, &MainWindow::slt_chkInquiry_stateChanged);
+    /****** 设置 -> 窗口置顶、渲染背景 ******/
+    connect(&dlgSet, &SetDialog::sigWindowOnTop, this, &MainWindow::sltWindowOnTop);
+    connect(&dlgSet, &SetDialog::sigRendererBackground, this, &MainWindow::sltRendererBackground);
+}
+
+void MainWindow::setRendererBackground(int index)
+{
+    // 设置渲染器背景颜色
+    switch (index) {
+    case 0:
+        renderer->SetBackground(0.1, 0.2, 0.4); // 深蓝色
+        break;
+    case 1:
+        renderer->SetBackground(0.0, 0.0, 0.0); // 黑色
+        break;
+    case 2:
+        renderer->SetBackground(0.5, 0.5, 0.5); // 灰色
+        break;
+    default:
+        renderer->SetBackground(0.1, 0.2, 0.4); // 深蓝色
+        break;
+    }
 }
 
 bool MainWindow::loadPointCloudFile(QString fileName)

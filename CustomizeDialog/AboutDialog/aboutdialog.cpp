@@ -36,7 +36,7 @@ void AboutDialog::initial()
     this->setWindowFlags(flags | Qt::WindowStaysOnTopHint); // 设置窗口标志位 窗口置顶
 
     // 设置窗口标题
-    this->setWindowTitle("QtHalconVTK"); // 设置窗口标志位 窗口置顶
+    this->setWindowTitle(QString("About %1").arg(TOSTRING(PROJECT_NAME))); // 设置窗口标志位 窗口置顶
 
     // 主体
     ui->widgetBody->setFont(QFont("Microsoft YaHei UI", 10)); //设置字体

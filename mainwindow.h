@@ -9,6 +9,7 @@
 #include <QCheckBox>
 
 #include "aboutdialog.h"
+#include "setdialog.h"
 
 // HALCON headers
 #include "HalconCpp.h"
@@ -42,8 +43,17 @@ public:
     ~MainWindow();
 
 protected:
-    /// @brief // 重写窗口的关闭事件处理
+    /// @brief 重写窗口的关闭事件处理
+    /// @param event 窗口关闭事件的信息
     void closeEvent(QCloseEvent *event) override;
+
+public slots:
+    /// @brief 窗口置顶
+    void sltWindowOnTop();
+
+    /// @brief 渲染背景
+    /// @param index Default:默认 Black:黑色 Gray:灰色
+    void sltRendererBackground(SysConfig::RendererBackground index);
 
 private slots:
     /// @brief 打开文件
@@ -61,9 +71,18 @@ private slots:
     /// @brief 关于
     void slt_actAbout_triggered();
 
-    void buttonClicked(QAbstractButton * butClicked);
+    /// @brief 关闭窗口点击的按钮
+    /// @param butClicked 抽象按钮
+    void buttonClicked(QAbstractButton *butClicked);
+
+    /// @brief 窗口询问改变
+    /// @param state 窗口询问状态
+    void slt_chkInquiry_stateChanged(int state);
 
 private:
+    /// @brief 初始化配置
+    void initSysConfig();
+
     /// @brief 初始化关闭窗口
     void initCloseWindow();
 
@@ -75,6 +94,9 @@ private:
 
     /// @brief 初始化信号与槽函数
     void initSignalsAndSlots();
+
+    /// @brief 渲染背景
+    void setRendererBackground(int index);
 
     /// @brief 加载点云文件
     /// @return true:成功 false:失败
@@ -107,11 +129,15 @@ private:
     /// @brief 关于对话框
     AboutDialog dlgAbout;
 
+    /// @brief 设置对话框
+    SetDialog dlgSet;
+
+    /// @brief 关闭窗口消息对话框
     QMessageBox msgBox;
-    QPushButton* btnAccept;
-    QPushButton* btnReject;
-    QCheckBox *checkBox;
-    bool bAcceptClose = false;
+    QPushButton *btnAccept;
+    QPushButton *btnReject;
+    QCheckBox chkInquiry;
+    bool bAcceptClose;
 
     // HALCON variables
     HalconCpp::HObjectModel3D model3D;

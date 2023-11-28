@@ -52,6 +52,7 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
 # 添加子目录
+add_subdirectory(Config)
 add_subdirectory(CustomizeDialog)
 
 set(PROJECT_SOURCES
@@ -60,6 +61,7 @@ set(PROJECT_SOURCES
         mainwindow.h
         mainwindow.ui
         Resource/Image/image.qrc
+        Resource/File/file.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -92,7 +94,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${VTK_LIBRARIES})
 # 链接 HALCON
 target_link_libraries(${PROJECT_NAME} PRIVATE halconcpp.lib halcon.lib)
 # 链接自定义对话框
-target_link_libraries(${PROJECT_NAME} PUBLIC CustomizeDialog)
+target_link_libraries(${PROJECT_NAME} PUBLIC Config CustomizeDialog)
 
 # 将二进制文件目录添加到包含文件的搜索路径中，以便我们找到 ProjectConfig.h
 target_include_directories(${PROJECT_NAME} PUBLIC
