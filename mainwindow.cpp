@@ -3,6 +3,7 @@
 
 #include <QCloseEvent>
 #include <QFileDialog>
+#include <QProcess>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -65,16 +66,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         QApplication::setActiveWindow(&msgBox); // 将指定窗口设置为活动窗口并将焦点设置到该窗口
         if (msgBox.isVisible() && bAcceptClose) {
             if (bAcceptClose) {
-                // 关闭关于对话框
-                if (dlgAbout.isVisible()) {
-                    dlgAbout.close();
-                }
-
-                // 关闭设置对话框
-                if (dlgSet.isVisible()) {
-                    dlgSet.close();
-                }
-
+                readyQuit(); // 准备退出
                 event->accept(); // 接受关闭事件
             }
         } else {
@@ -82,17 +74,26 @@ void MainWindow::closeEvent(QCloseEvent *event)
             msgBox.show();
         }
     } else {
-        // 关闭关于对话框
-        if (dlgAbout.isVisible()) {
-            dlgAbout.close();
-        }
-
-        // 关闭设置对话框
-        if (dlgSet.isVisible()) {
-            dlgSet.close();
-        }
-
+        readyQuit(); // 准备退出
         event->accept(); // 接受关闭事件
+    }
+}
+
+void MainWindow::readyQuit()
+{
+    // 关闭关于对话框
+    if (dlgAbout.isVisible()) {
+        dlgAbout.close();
+    }
+
+    // 关闭设置对话框
+    if (dlgSet.isVisible()) {
+        dlgSet.close();
+    }
+
+    // 关闭通用对话框
+    if (dlgCommon.isVisible()) {
+        dlgCommon.close();
     }
 }
 
@@ -153,6 +154,11 @@ void MainWindow::slt_actOpen_triggered()
     }
 }
 
+void MainWindow::slt_actQuit_triggered()
+{
+    this->close();
+}
+
 void MainWindow::slt_actReset_triggered()
 {
     // 清空插入的点
@@ -203,21 +209,51 @@ void MainWindow::slt_actAdd_triggered()
     renderWindow->Render();
 }
 
+void MainWindow::slt_actRestart_triggered()
+{
+#if 0
+    qDebug() << "applicationFilePath " << QCoreApplication::applicationFilePath();
+    qDebug() << "arguments " << QCoreApplication::arguments();
+
+    /// 法一
+    qApp->quit();
+    QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
+
+    /// 法二
+    QString program = QCoreApplication::applicationFilePath(); // 应用程序的路径
+    QStringList arguments = QCoreApplication::arguments(); // 应用程序的参数列表
+    QProcess::startDetached(program, arguments);
+    qApp->exit();
+
+    /// 法三
+    // 退出当前进程
+    QCoreApplication::exit(0);
+    // 启动新的进程
+    QProcess::startDetached(qApp->applicationFilePath(), QStringList());
+#endif
+
+    // 退出应用程序的主事件循环，从而关闭应用程序
+    QCoreApplication::quit();
+
+    // 启动新的进程来运行应用程序
+    QProcess::startDetached(QCoreApplication::applicationFilePath(), QCoreApplication::arguments());
+}
+
+void MainWindow::slt_actUniversal_triggered()
+{
+    // 设置对话框
+    if (!dlgSet.isVisible()) {
+        dlgSet.show(); //非模态显示对话框
+        dlgSet.setDefaultButton(); //设置默认按钮
+    }
+}
+
 void MainWindow::slt_actAbout_triggered()
 {
     // 关于对话框
     if (!dlgAbout.isVisible()) {
         dlgAbout.show(); //非模态显示对话框
         dlgAbout.setDefaultButton(); //设置默认按钮
-    }
-}
-
-void MainWindow::slt_actGeneral_triggered()
-{
-    // 设置对话框
-    if (!dlgSet.isVisible()) {
-        dlgSet.show(); //非模态显示对话框
-        dlgSet.setDefaultButton(); //设置默认按钮
     }
 }
 
@@ -348,17 +384,28 @@ void MainWindow::initVTK()
 
 void MainWindow::initSignalsAndSlots()
 {
-    // QAction 项对应的槽
+    /************ QAction 项对应的槽 ************/
+    // 打开文件
     connect(ui->actOpen, &QAction::triggered, this, &MainWindow::slt_actOpen_triggered);
+    // 退出
+    connect(ui->actQuit, &QAction::triggered, this, &MainWindow::slt_actQuit_triggered);
+    // 重置
     connect(ui->actReset, &QAction::triggered, this, &MainWindow::slt_actReset_triggered);
+    // 添加
     connect(ui->actAdd, &QAction::triggered, this, &MainWindow::slt_actAdd_triggered);
-    connect(ui->actGeneral, &QAction::triggered, this, &MainWindow::slt_actGeneral_triggered);
+    // 重启
+    connect(ui->actRestart, &QAction::triggered, this, &MainWindow::slt_actRestart_triggered);
+    // 通用
+    connect(ui->actUniversal, &QAction::triggered, this, &MainWindow::slt_actUniversal_triggered);
+    // 关于
     connect(ui->actAbout, &QAction::triggered, this, &MainWindow::slt_actAbout_triggered);
     // 连接信号与槽，监听用户点击的按钮，如果用户同意关闭，则程序退出
     connect(&msgBox, &QMessageBox::buttonClicked, this, &MainWindow::buttonClicked);
     // 窗口询问改变
     connect(&chkInquiry, &QCheckBox::stateChanged, this, &MainWindow::slt_chkInquiry_stateChanged);
-    /****** 设置 -> 窗口置顶、渲染背景 ******/
+    /************ 设置 ************/
+    // 窗口置顶
+    // 渲染背景
     connect(&dlgSet, &SetDialog::sigWindowOnTop, this, &MainWindow::sltWindowOnTop);
     connect(&dlgSet, &SetDialog::sigRendererBackground, this, &MainWindow::sltRendererBackground);
 }
@@ -404,13 +451,19 @@ bool MainWindow::loadPointCloudFile(QString fileName)
     HalconCpp::HString result = model3D.ReadObjectModel3d(fileName.toStdString().c_str(), "m", HalconCpp::HTuple(), HalconCpp::HTuple());
 
     // 检查读取结果
-    if (result.IsEmpty())
-    {
-        std::cout << "3D object model read successfully." << std::endl;
-    }
-    else
-    {
-        std::cout << "Failed to read 3D object model: " << result << std::endl;
+    if (result.IsEmpty()) {
+//        std::cout << "3D object model read successfully." << std::endl;
+    } else {
+//        std::cout << "Failed to read 3D object model: " << result << std::endl;
+
+        // 通用对话框
+        dlgCommon.setWidgetTitle("读取 3D 对象模型失败");
+        dlgCommon.setWidgetIcon(":/Dialog/qmessagebox-crit.png");
+        dlgCommon.setWidgetContent(fileName);
+        if (!dlgCommon.isVisible()) {
+            dlgCommon.show(); //非模态显示对话框
+        }
+        dlgCommon.setDefaultButton(); //设置默认按钮
 
         return false;
     }
@@ -427,12 +480,21 @@ bool MainWindow::getPointCloudData()
 
     std::cout << x.Length() << " "
               << y.Length() << " "
-              << z.Length() << " " << std::endl;
+              << z.Length() << std::endl;
 
     if (x.Length() == y.Length() && y.Length() == z.Length()) {
-        std::cout << "object model 3dParams get successfully." << std::endl;
+//        std::cout << "object model 3dParams get successfully." << std::endl;
     } else {
-        std::cout << "Failed to get object model 3dParams." << std::endl;
+//        std::cout << "Failed to get object model 3dParams." << std::endl;
+
+        // 通用对话框
+        dlgCommon.setWidgetTitle("获取点云数据个数不一致");
+        dlgCommon.setWidgetIcon(":/Dialog/qmessagebox-crit.png");
+        dlgCommon.setWidgetContent(QString("x: %1\ny: %2\nz: %3\n").arg(x.Length()).arg(y.Length()).arg(z.Length()));
+        if (!dlgCommon.isVisible()) {
+            dlgCommon.show(); //非模态显示对话框
+        }
+        dlgCommon.setDefaultButton(); //设置默认按钮
 
         return false;
     }

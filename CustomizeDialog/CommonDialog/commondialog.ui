@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>CommonDialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,29,6">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="32,8">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -30,14 +30,8 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="widgetTitle" native="true">
-     <property name="styleSheet">
-      <string notr="true">QWidget {
-	color: rgb(255, 255, 255);
-	background-color: rgb(170, 170, 170);
-}</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+    <widget class="QWidget" name="widgetContent" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,4,1">
       <property name="spacing">
        <number>10</number>
       </property>
@@ -55,31 +49,13 @@
       </property>
       <item>
        <widget class="QLabel" name="lbWindowIcon">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
         <property name="text">
          <string/>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="lbWindowTitle">
+       <widget class="QLabel" name="lbContent">
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -102,34 +78,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widgetContent" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="spacing">
-       <number>10</number>
-      </property>
-      <property name="leftMargin">
-       <number>10</number>
-      </property>
-      <property name="topMargin">
-       <number>10</number>
-      </property>
-      <property name="rightMargin">
-       <number>10</number>
-      </property>
-      <property name="bottomMargin">
-       <number>10</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="lbContent">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QWidget" name="widgetBottom" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="spacing">
@@ -139,13 +87,13 @@
        <number>10</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>30</number>
       </property>
       <property name="rightMargin">
        <number>10</number>
       </property>
       <property name="bottomMargin">
-       <number>36</number>
+       <number>30</number>
       </property>
       <item>
        <spacer name="horizontalSpacer">
@@ -159,13 +107,6 @@
          </size>
         </property>
        </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnCancel">
-        <property name="text">
-         <string>取消</string>
-        </property>
-       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnSure">

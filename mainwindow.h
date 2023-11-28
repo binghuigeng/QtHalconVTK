@@ -10,6 +10,7 @@
 
 #include "aboutdialog.h"
 #include "setdialog.h"
+#include "commondialog.h"
 
 // HALCON headers
 #include "HalconCpp.h"
@@ -47,6 +48,9 @@ protected:
     /// @param event 窗口关闭事件的信息
     void closeEvent(QCloseEvent *event) override;
 
+    /// @brief 准备退出
+    void readyQuit();
+
 public slots:
     /// @brief 窗口置顶
     void sltWindowOnTop();
@@ -59,14 +63,20 @@ private slots:
     /// @brief 打开文件
     void slt_actOpen_triggered();
 
+    /// @brief 退出
+    void slt_actQuit_triggered();
+
     /// @brief 重置
     void slt_actReset_triggered();
 
     /// @brief 添加
     void slt_actAdd_triggered();
 
+    /// @brief 重启
+    void slt_actRestart_triggered();
+
     /// @brief 通用
-    void slt_actGeneral_triggered();
+    void slt_actUniversal_triggered();
 
     /// @brief 关于
     void slt_actAbout_triggered();
@@ -131,6 +141,9 @@ private:
 
     /// @brief 设置对话框
     SetDialog dlgSet;
+
+    /// @brief 通用对话框
+    CommonDialog dlgCommon;
 
     /// @brief 关闭窗口消息对话框
     QMessageBox msgBox;

@@ -27,18 +27,8 @@ public:
     /// @param content 内容
     void setWidgetContent(const QString &content);
 
-    /// @brief 隐藏取消按钮
-    void hiddenCancelButton();
-
     /// @brief 设置默认按钮
     void setDefaultButton();
-
-signals:
-    /// @brief 选择确定按钮
-    void sigChooseSureButton();
-
-private slots:
-    void slt_btnSure_clicked();
 
 private:
     Ui::CommonDialog *ui;
