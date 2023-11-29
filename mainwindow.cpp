@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
     this->setWindowTitle("点云编辑器 - guchi"); // 设置窗口标题
 
+    initial(); // 初始化
     initSysConfig(); // 初始化配置
     initCloseWindow(); // 初始化关闭窗口
     initStatusbarMessage(); // 初始化状态栏显示消息
@@ -144,11 +145,14 @@ void MainWindow::slt_actOpen_triggered()
                 this, "打开文件", "", "点云文件 (*.ply)");
 
     if (!filename.isEmpty()) {
+        // 加载点云文件
         if (loadPointCloudFile(filename))
         {
+            // 获取点云数据
             if (getPointCloudData()) {
-                extractPointCloudCoordinates();
-                showPointCloud();
+                extractPointCloudCoordinates(); // 提取点云坐标
+                showPointNum(); // 显示点云个数
+                showPointCloud(); // 显示点云
             }
         }
     }
@@ -276,6 +280,12 @@ void MainWindow::slt_chkInquiry_stateChanged(int state)
         SysConfig::setWindowClose(true);
         dlgSet.setWidgetContent(true);
     }
+}
+
+void MainWindow::initial()
+{
+    // 设置字体、字号、粗体、斜体
+    ui->lbPointNum->setFont(QFont("Microsoft YaHei UI", 10, QFont::Normal, false));
 }
 
 void MainWindow::initSysConfig()
@@ -478,9 +488,9 @@ bool MainWindow::getPointCloudData()
     y = model3D.GetObjectModel3dParams("point_coord_y");
     z = model3D.GetObjectModel3dParams("point_coord_z");
 
-    std::cout << x.Length() << " "
-              << y.Length() << " "
-              << z.Length() << std::endl;
+//    std::cout << x.Length() << " "
+//              << y.Length() << " "
+//              << z.Length() << std::endl;
 
     if (x.Length() == y.Length() && y.Length() == z.Length()) {
 //        std::cout << "object model 3dParams get successfully." << std::endl;
@@ -516,7 +526,12 @@ void MainWindow::extractPointCloudCoordinates()
 //        std::cout << pointX << " "
 //                  << pointY << " "
 //                  << pointZ << " " << std::endl;
-//    }
+    //    }
+}
+
+void MainWindow::showPointNum()
+{
+    ui->lbPointNum->setText(QString("点云个数：%1").arg(x.Length()));
 }
 
 void MainWindow::showPointCloud()
@@ -586,7 +601,7 @@ void MainWindow::showDefaultWindow()
 
     std::cout << x.Length() << " "
               << y.Length() << " "
-              << z.Length() << " " << std::endl;
+              << z.Length() << std::endl;
 
     // 提取点云坐标
     HalconCpp::HTuple pointCount = x.Length();
@@ -714,7 +729,7 @@ void MainWindow::showVTKWidget()
 
     std::cout << x.Length() << " "
               << y.Length() << " "
-              << z.Length() << " " << std::endl;
+              << z.Length() << std::endl;
 
     // 提取点云坐标
     HalconCpp::HTuple pointCount = x.Length();

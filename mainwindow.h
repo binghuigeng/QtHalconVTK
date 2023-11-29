@@ -90,6 +90,9 @@ private slots:
     void slt_chkInquiry_stateChanged(int state);
 
 private:
+    /// @brief 初始化
+    void initial();
+
     /// @brief 初始化配置
     void initSysConfig();
 
@@ -118,6 +121,9 @@ private:
 
     /// @brief 提取点云坐标
     void extractPointCloudCoordinates();
+
+    /// @brief 显示点云个数
+    void showPointNum();
 
     /// @brief 显示点云
     void showPointCloud();
