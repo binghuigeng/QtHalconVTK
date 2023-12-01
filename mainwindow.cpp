@@ -323,13 +323,12 @@ void MainWindow::initStatusbarMessage()
 //    ui->statusbar->showMessage(tr("Ready"));
 
     // 创建一个标签并设置居中对齐
-    statusLabel = new QLabel(this);
-    statusLabel->setAlignment(Qt::AlignCenter);
-    statusLabel->setText("<a href=\"https://www.baidu.com\" style=\"text-decoration: none; color: #000000;\">Copyright 2022-2023 The guchi Company Ltd. All rights reserved.</a>");
-    statusLabel->setOpenExternalLinks(true);
+    statusLabel.setAlignment(Qt::AlignCenter);
+    statusLabel.setText("<a href=\"https://www.guchi-robotics.com\" style=\"text-decoration: none; color: #000000;\">Copyright 2022-2023 The guchi Company Ltd. All rights reserved.</a>");
+    statusLabel.setOpenExternalLinks(true);
 
     // 将标签添加到状态栏，并设置其占用状态栏的比例为1
-    ui->statusbar->addWidget(statusLabel, 1);
+    ui->statusbar->addWidget(&statusLabel, 1);
 }
 
 void MainWindow::initVTK()

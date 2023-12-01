@@ -145,7 +145,7 @@ private:
     Ui::MainWindow *ui;
 
     /// @brief 状态栏消息标签
-    QLabel *statusLabel;
+    QLabel statusLabel;
 
     /// @brief 关于对话框
     AboutDialog dlgAbout;
