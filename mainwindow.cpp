@@ -170,6 +170,7 @@ void MainWindow::slt_actReset_triggered()
 
     // 刷新渲染窗口
     renderWindow->Render();
+    renderWindowInteractor->GetInteractor()->Render();
 }
 
 void MainWindow::slt_actAdd_triggered()
@@ -211,6 +212,7 @@ void MainWindow::slt_actAdd_triggered()
 
     // 刷新渲染窗口以显示新的点云数据
     renderWindow->Render();
+    renderWindowInteractor->GetInteractor()->Render();
 }
 
 void MainWindow::slt_actRestart_triggered()
@@ -380,13 +382,29 @@ void MainWindow::initVTK()
     renderWindowInteractor = new QVTKOpenGLWidget(this);
     renderWindowInteractor->SetRenderWindow(renderWindow); // 设置渲染窗口
 
+    // 创建坐标系
+    axes = vtkSmartPointer<vtkAxesActor>::New();
+
+    // 创建坐标系标记
+    marker = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+    marker->SetOrientationMarker(axes); // 设置坐标系
+    marker->SetInteractor(renderWindowInteractor->GetInteractor()); // 设置交互器
+    marker->SetViewport(0.0, 0.0, 0.2, 0.2); // 设置坐标系标记的位置和大小
+    marker->SetEnabled(1); // 启用坐标系标记
+    marker->InteractiveOn(); // 启用或激活交互功能。当交互功能被启用时，用户可以使用鼠标来旋转、缩放和平移坐标轴。
+
     // 创建交互器样式
     style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-    renderWindowInteractor->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
+    renderWindowInteractor->GetInteractor()->SetInteractorStyle(style);
 
     // 开启渲染和交互
     renderWindow->Render();
-//    renderWindowInteractor->Start();
+    /*************************************************************************
+    ** @brief 移除 qvtkWidget->GetInteractor()->Start(); 的原因
+    ** 因为在使用 QVTKOpenGLWidget 时，不需要显式调用 Start() 方法
+    ** 相反，我们直接调用 qvtkWidget->GetInteractor()->Render() 来触发交互器的渲染
+    *************************************************************************/
+    renderWindowInteractor->GetInteractor()->Render();
 
     // 添加到布局中
     ui->verticalLayout->addWidget(renderWindowInteractor);
@@ -799,11 +817,16 @@ void MainWindow::showVTKWidget()
 
     // 创建交互器样式
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-    renderWindowInteractor->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
+    renderWindowInteractor->GetInteractor()->SetInteractorStyle(style);
 
     // 开启渲染和交互
     renderWindow->Render();
-//    renderWindowInteractor->Start();
+    /*************************************************************************
+    ** @brief 移除 qvtkWidget->GetInteractor()->Start(); 的原因
+    ** 因为在使用 QVTKOpenGLWidget 时，不需要显式调用 Start() 方法
+    ** 相反，我们直接调用 qvtkWidget->GetInteractor()->Render() 来触发交互器的渲染
+    *************************************************************************/
+    renderWindowInteractor->GetInteractor()->Render();
 
     // 添加到布局中
     ui->verticalLayout->addWidget(renderWindowInteractor);

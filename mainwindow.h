@@ -29,7 +29,12 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <QVTKOpenGLWidget.h>
+#include <vtkAxesActor.h>
+#include <vtkOrientationMarkerWidget.h>
 #include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkMatrix4x4.h>
+#include <vtkTransform.h>
+#include <vtkCamera.h> // 添加vtkCamera的头文件
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -173,6 +178,10 @@ private:
     vtkSmartPointer<vtkRenderer> renderer; // 渲染器
     vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow; // 渲染窗口
     QVTKOpenGLWidget *renderWindowInteractor; // 交互器
+    vtkSmartPointer<vtkAxesActor> axes; // 坐标系
+    vtkSmartPointer<vtkOrientationMarkerWidget> marker; // 坐标系标记
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> style; // 交互器样式
+    vtkSmartPointer<vtkMatrix4x4> matrix;
+    vtkSmartPointer<vtkTransform> transform;
 };
 #endif // MAINWINDOW_H
