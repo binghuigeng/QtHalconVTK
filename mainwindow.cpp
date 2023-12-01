@@ -286,8 +286,8 @@ void MainWindow::slt_chkInquiry_stateChanged(int state)
 
 void MainWindow::initial()
 {
-    // 设置字体、字号、粗体、斜体
-    ui->lbPointNum->setFont(QFont("Microsoft YaHei UI", 10, QFont::Normal, false));
+    ui->lbPointNum->setAlignment(Qt::AlignCenter); // 居中对齐
+    ui->lbPointNum->setFont(QFont("Microsoft YaHei UI", 10, QFont::Normal, false)); // 设置字体、字号、粗体、斜体
 }
 
 void MainWindow::initSysConfig()
