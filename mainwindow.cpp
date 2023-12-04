@@ -168,9 +168,20 @@ void MainWindow::slt_actReset_triggered()
     // 清空插入的点
     points->Reset();
 
+    bool interactive = marker->GetInteractive();
+
+    // 判断交互功能是否开启
+    if (marker->GetInteractive())
+    {
+        marker->InteractiveOff(); // 禁用交互功能
+    }
+    marker->SetEnabled(0); // 禁用坐标系标记
+
     // 刷新渲染窗口
     renderWindow->Render();
     renderWindowInteractor->GetInteractor()->Render();
+
+    ui->lbPointNum->clear(); // 清空点云个数内容
 }
 
 void MainWindow::slt_actAdd_triggered()
@@ -209,6 +220,9 @@ void MainWindow::slt_actAdd_triggered()
 
     // 根据点云数据自适应地设置相机位置和视角
     renderer->ResetCamera();
+
+    marker->SetEnabled(1); // 启用坐标系标记
+    marker->InteractiveOn(); // 启用或激活交互功能。当交互功能被启用时，用户可以使用鼠标来旋转、缩放和平移坐标轴
 
     // 刷新渲染窗口以显示新的点云数据
     renderWindow->Render();
@@ -286,6 +300,7 @@ void MainWindow::slt_chkInquiry_stateChanged(int state)
 
 void MainWindow::initial()
 {
+    ui->lbPointNum->clear(); // 清空点云个数内容
     ui->lbPointNum->setAlignment(Qt::AlignCenter); // 居中对齐
     ui->lbPointNum->setFont(QFont("Microsoft YaHei UI", 10, QFont::Normal, false)); // 设置字体、字号、粗体、斜体
 }
@@ -348,10 +363,26 @@ void MainWindow::initVTK()
 //        vertices->InsertCellPoint(i);
 //    }
 
+    // 创建颜色数组
+//    colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+//    colors->SetNumberOfComponents(3);
+//    colors->SetName("Colors");
+//    unsigned char color[3] = {255, 0, 0}; // 假设为红色
+//    colors->InsertNextTypedTuple(color);  // 点1为红色
+//    colors->InsertNextTypedTuple({0, 255, 0});  // 点2为绿色
+//    colors->InsertNextTypedTuple({0, 0, 255});  // 点3为蓝色
+
+//     scalars = vtkSmartPointer<vtkFloatArray>::New();
+//     //设定每个顶点的标量值
+//     for (int i = 0; i < 8; i++)
+//         scalars->InsertTuple1(i,  i*4);
+
     // 创建多边形数据
     polyData = vtkSmartPointer<vtkPolyData>::New();
     polyData->SetPoints(points);
     polyData->SetVerts(vertices);
+    polyData->SetPolys(vertices);
+//    polyData->GetPointData()->SetScalars(scalars);
 
     // 创建顶点滤波器
     vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
@@ -381,6 +412,10 @@ void MainWindow::initVTK()
     renderWindowInteractor = new QVTKOpenGLWidget(this);
     renderWindowInteractor->SetRenderWindow(renderWindow); // 设置渲染窗口
 
+    // 创建交互器样式
+    style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+    renderWindowInteractor->GetInteractor()->SetInteractorStyle(style);
+
     // 创建坐标系
     axes = vtkSmartPointer<vtkAxesActor>::New();
 
@@ -389,12 +424,6 @@ void MainWindow::initVTK()
     marker->SetOrientationMarker(axes); // 设置坐标系
     marker->SetInteractor(renderWindowInteractor->GetInteractor()); // 设置交互器
     marker->SetViewport(0.0, 0.0, 0.2, 0.2); // 设置坐标系标记的位置和大小
-    marker->SetEnabled(1); // 启用坐标系标记
-    marker->InteractiveOn(); // 启用或激活交互功能。当交互功能被启用时，用户可以使用鼠标来旋转、缩放和平移坐标轴。
-
-    // 创建交互器样式
-    style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-    renderWindowInteractor->GetInteractor()->SetInteractorStyle(style);
 
     // 开启渲染和交互
     renderWindow->Render();
@@ -587,6 +616,9 @@ void MainWindow::showPointCloud()
 
     // 根据点云数据自适应地设置相机位置和视角
     renderer->ResetCamera();
+
+    marker->SetEnabled(1); // 启用坐标系标记
+    marker->InteractiveOn(); // 启用或激活交互功能。当交互功能被启用时，用户可以使用鼠标来旋转、缩放和平移坐标轴
 
     // 刷新渲染窗口以显示新的点云数据
     renderWindow->Render();

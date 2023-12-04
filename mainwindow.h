@@ -19,6 +19,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtkPolyData.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkPolyDataMapper.h>
@@ -35,6 +36,11 @@
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
 #include <vtkCamera.h> // 添加vtkCamera的头文件
+#include <vtkTransformFilter.h> // 添加vtkCamera的头文件
+
+#include <vtkDataSet.h>
+#include <vtkFloatArray.h>
+#include <vtkLookupTable.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -171,6 +177,7 @@ private:
     // VTK variables
     vtkSmartPointer<vtkPoints> points; // 点云数据
     vtkSmartPointer<vtkCellArray> vertices; // 顶点
+    vtkSmartPointer<vtkUnsignedCharArray> colors; // 颜色数组
     vtkSmartPointer<vtkPolyData> polyData; // 多边形数据
     vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter; // 顶点滤波器
     vtkSmartPointer<vtkPolyDataMapper> mapper; // 点云映射器
@@ -183,5 +190,6 @@ private:
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> style; // 交互器样式
     vtkSmartPointer<vtkMatrix4x4> matrix;
     vtkSmartPointer<vtkTransform> transform;
+    vtkSmartPointer<vtkFloatArray> scalars;
 };
 #endif // MAINWINDOW_H
