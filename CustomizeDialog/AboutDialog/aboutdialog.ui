@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>600</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>AboutDialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="56,4">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="36,4">
    <property name="spacing">
     <number>0</number>
    </property>
