@@ -18,30 +18,23 @@
 // VTK headers
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
-#include <vtkPointData.h>
 #include <vtkCellArray.h>
-#include <vtkUnsignedCharArray.h>
+#include <vtkFloatArray.h>
 #include <vtkPolyData.h>
 #include <vtkVertexGlyphFilter.h>
+#include <vtkLookupTable.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
-#include <vtkProperty.h>
+#include <vtkScalarBarActor.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <QVTKOpenGLWidget.h>
+#include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkAxesActor.h>
 #include <vtkOrientationMarkerWidget.h>
-#include <vtkInteractorStyleTrackballCamera.h>
-#include <vtkMatrix4x4.h>
-#include <vtkTransform.h>
-#include <vtkCamera.h> // 添加vtkCamera的头文件
-#include <vtkTransformFilter.h> // 添加vtkCamera的头文件
 
-#include <vtkDataSet.h>
-#include <vtkFloatArray.h>
-#include <vtkLookupTable.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -134,8 +127,9 @@ private:
     /// @brief 提取点云坐标
     void extractPointCloudCoordinates();
 
-    /// @brief 显示点云个数
-    void showPointNum();
+    /// @brief 显示点云文件信息
+    /// @param fileName 文件路径
+    void showPointCloudFile(QString fileName);
 
     /// @brief 显示点云
     void showPointCloud();
@@ -178,20 +172,18 @@ private:
     // VTK variables
     vtkSmartPointer<vtkPoints> points; // 点云数据
     vtkSmartPointer<vtkCellArray> vertices; // 顶点
-    vtkSmartPointer<vtkUnsignedCharArray> colors; // 颜色数组
+    vtkSmartPointer<vtkFloatArray> scalars; // 标量数据
     vtkSmartPointer<vtkPolyData> polyData; // 多边形数据
     vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter; // 顶点滤波器
+    vtkSmartPointer<vtkLookupTable> lut; // 颜色映射
     vtkSmartPointer<vtkPolyDataMapper> mapper; // 点云映射器
     vtkSmartPointer<vtkActor> actor; // 点云演员
+    vtkSmartPointer<vtkScalarBarActor> scalarBar; // 标量条
     vtkSmartPointer<vtkRenderer> renderer; // 渲染器
     vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow; // 渲染窗口
     QVTKOpenGLWidget *renderWindowInteractor; // 交互器
+    vtkSmartPointer<vtkInteractorStyleTrackballCamera> style; // 交互器样式
     vtkSmartPointer<vtkAxesActor> axes; // 坐标系
     vtkSmartPointer<vtkOrientationMarkerWidget> marker; // 坐标系标记
-    vtkSmartPointer<vtkInteractorStyleTrackballCamera> style; // 交互器样式
-    vtkSmartPointer<vtkMatrix4x4> matrix;
-    vtkSmartPointer<vtkTransform> transform;
-    vtkSmartPointer<vtkFloatArray> scalars; // 标量数据
-    vtkSmartPointer<vtkLookupTable> lut; // 颜色映射
 };
 #endif // MAINWINDOW_H

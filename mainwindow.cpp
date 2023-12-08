@@ -1,6 +1,12 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+// VTK headers
+#include <vtkPointData.h>
+#include <vtkDataSet.h>
+#include <vtkProperty.h>
+#include <vtkTextProperty.h>
+
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QProcess>
@@ -141,17 +147,17 @@ void MainWindow::sltRendererBackground(SysConfig::RendererBackground index)
 void MainWindow::slt_actOpen_triggered()
 {
     // 选择 .ply 文件
-    QString filename = QFileDialog::getOpenFileName(
+    QString fileName = QFileDialog::getOpenFileName(
                 this, "打开文件", "", "点云文件 (*.ply)");
 
-    if (!filename.isEmpty()) {
+    if (!fileName.isEmpty()) {
         // 加载点云文件
-        if (loadPointCloudFile(filename))
+        if (loadPointCloudFile(fileName))
         {
             // 获取点云数据
             if (getPointCloudData()) {
                 extractPointCloudCoordinates(); // 提取点云坐标
-                showPointNum(); // 显示点云个数
+                showPointCloudFile(fileName); // 显示点云文件信息
                 showPointCloud(); // 显示点云
             }
         }
@@ -168,6 +174,7 @@ void MainWindow::slt_actReset_triggered()
     // 清空插入的点
     points->Reset();
 
+    scalarBar->SetVisibility(false); // 隐藏标量条
     marker->SetEnabled(0); // 禁用坐标系标记
 
     // 刷新渲染窗口
@@ -226,6 +233,7 @@ void MainWindow::slt_actAdd_triggered()
     // 根据点云数据自适应地设置相机位置和视角
     renderer->ResetCamera();
 
+    scalarBar->SetVisibility(true); // 显示标量条
     marker->SetEnabled(1); // 启用坐标系标记
 
     // 刷新渲染窗口以显示新的点云数据
@@ -378,17 +386,17 @@ void MainWindow::initVTK()
     polyData->SetPoints(points);
     polyData->SetVerts(vertices);
     polyData->SetPolys(vertices);
-    polyData->GetPointData()->SetScalars(colors); // 将标量属性设置到点云
+    polyData->GetPointData()->SetScalars(scalars); // 将标量属性设置到点云
+
+    // 创建顶点滤波器
+    vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+    vertexFilter->SetInputData(polyData);
 
     // 创建颜色映射
     lut = vtkSmartPointer<vtkLookupTable>::New();
     lut->SetNumberOfColors(256);
     lut->SetHueRange(0.67, 0.0); // 色调范围从红色到蓝色
     lut->Build();
-
-    // 创建顶点滤波器
-    vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
-    vertexFilter->SetInputData(polyData);
 
     // 创建点云映射器
     mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -401,9 +409,23 @@ void MainWindow::initVTK()
     actor->SetMapper(mapper);
 //    actor->GetProperty()->SetPointSize(5);
 
+    // 创建标量条
+    scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+    scalarBar->SetLookupTable(mapper->GetLookupTable());
+    scalarBar->SetTitle("Color Scale");
+    scalarBar->SetHeight(0.8);
+    scalarBar->SetWidth(0.1);
+    scalarBar->SetNumberOfLabels(5);
+    scalarBar->GetLabelTextProperty()->SetFontSize(9);
+    scalarBar->SetOrientationToVertical();
+    scalarBar->SetTextPositionToSucceedScalarBar();
+    scalarBar->SetPosition(0.82, 0.1); // 这里的坐标表示相对于窗口的位置，(0,0)是左下角，(1,1)是右上角
+    scalarBar->SetVisibility(false); // 隐藏标量条
+
     // 创建渲染器
     renderer = vtkSmartPointer<vtkRenderer>::New();
     renderer->AddActor(actor);
+    renderer->AddActor(scalarBar); // 将标量条添加到渲染器中
 //    renderer->SetBackground(0.1, 0.2, 0.4); // 设置渲染器背景颜色
     setRendererBackground(SysConfig::getRendererBackground()); // 依据配置文件设置渲染器背景颜色
 
@@ -579,9 +601,9 @@ void MainWindow::extractPointCloudCoordinates()
     //    }
 }
 
-void MainWindow::showPointNum()
+void MainWindow::showPointCloudFile(QString fileName)
 {
-    ui->lbPointNum->setText(QString("点云个数：%1").arg(x.Length()));
+    ui->lbPointNum->setText(QString("打开文件：%1    点云个数：%2").arg(fileName).arg(x.Length()));
 }
 
 void MainWindow::showPointCloud()
@@ -633,6 +655,7 @@ void MainWindow::showPointCloud()
     // 根据点云数据自适应地设置相机位置和视角
     renderer->ResetCamera();
 
+    scalarBar->SetVisibility(true); // 显示标量条
     marker->SetEnabled(1); // 启用坐标系标记
 
     // 刷新渲染窗口以显示新的点云数据
