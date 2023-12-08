@@ -168,13 +168,6 @@ void MainWindow::slt_actReset_triggered()
     // 清空插入的点
     points->Reset();
 
-    bool interactive = marker->GetInteractive();
-
-    // 判断交互功能是否开启
-    if (marker->GetInteractive())
-    {
-        marker->InteractiveOff(); // 禁用交互功能
-    }
     marker->SetEnabled(0); // 禁用坐标系标记
 
     // 刷新渲染窗口
@@ -201,6 +194,9 @@ void MainWindow::slt_actAdd_triggered()
     // 清空插入的顶点
     vertices->Reset();
 
+    // 清空标量值
+    scalars->Initialize();
+
     // 插入顶点 创建一个包含单个顶点的单元，并将点云数据中的每个点与这些单元关联起来，从而定义了点云数据的拓扑结构
     for (int i = 0; i < points->GetNumberOfPoints(); i++)
     {
@@ -213,16 +209,24 @@ void MainWindow::slt_actAdd_triggered()
         vertices->InsertNextCell(1);
         // 将点的索引 i 添加到刚刚插入的单元中。这样就将点云数据中的每个点与一个单元关联起来了。
         vertices->InsertCellPoint(i);
+
+        // 设置顶点的标量值
+        scalars->InsertTuple1(i,  i);
     }
 
     // 假设 vertices 已经被改变
     vertices->Modified(); // 标记 vertices 数据已经被修改
 
+    // 将标量属性设置到点云
+    polyData->GetPointData()->SetScalars(scalars);
+
+    mapper->SetScalarRange(0, polyData->GetNumberOfPoints());
+    mapper->Modified(); // 假设 mapper 已经被改变
+
     // 根据点云数据自适应地设置相机位置和视角
     renderer->ResetCamera();
 
     marker->SetEnabled(1); // 启用坐标系标记
-    marker->InteractiveOn(); // 启用或激活交互功能。当交互功能被启用时，用户可以使用鼠标来旋转、缩放和平移坐标轴
 
     // 刷新渲染窗口以显示新的点云数据
     renderWindow->Render();
@@ -357,32 +361,30 @@ void MainWindow::initVTK()
 
     // 创建顶点
     vertices = vtkSmartPointer<vtkCellArray>::New();
-//    for (int i = 0; i < points->GetNumberOfPoints(); i++)
-//    {
-//        vertices->InsertNextCell(1);
-//        vertices->InsertCellPoint(i);
-//    }
 
-    // 创建颜色数组
-//    colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
-//    colors->SetNumberOfComponents(3);
-//    colors->SetName("Colors");
-//    unsigned char color[3] = {255, 0, 0}; // 假设为红色
-//    colors->InsertNextTypedTuple(color);  // 点1为红色
-//    colors->InsertNextTypedTuple({0, 255, 0});  // 点2为绿色
-//    colors->InsertNextTypedTuple({0, 0, 255});  // 点3为蓝色
+    // 创建标量数据
+    scalars = vtkSmartPointer<vtkFloatArray>::New();
+    for (vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
+    {
+        vertices->InsertNextCell(1);
+        vertices->InsertCellPoint(i);
 
-//     scalars = vtkSmartPointer<vtkFloatArray>::New();
-//     //设定每个顶点的标量值
-//     for (int i = 0; i < 8; i++)
-//         scalars->InsertTuple1(i,  i*4);
+        // 设置顶点的标量值
+        scalars->InsertTuple1(i,  i);
+    }
 
     // 创建多边形数据
     polyData = vtkSmartPointer<vtkPolyData>::New();
     polyData->SetPoints(points);
     polyData->SetVerts(vertices);
     polyData->SetPolys(vertices);
-//    polyData->GetPointData()->SetScalars(scalars);
+    polyData->GetPointData()->SetScalars(colors); // 将标量属性设置到点云
+
+    // 创建颜色映射
+    lut = vtkSmartPointer<vtkLookupTable>::New();
+    lut->SetNumberOfColors(256);
+    lut->SetHueRange(0.67, 0.0); // 色调范围从红色到蓝色
+    lut->Build();
 
     // 创建顶点滤波器
     vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
@@ -391,6 +393,8 @@ void MainWindow::initVTK()
     // 创建点云映射器
     mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInputConnection(vertexFilter->GetOutputPort());
+    mapper->SetScalarRange(0, polyData->GetNumberOfPoints());
+    mapper->SetLookupTable(lut);
 
     // 创建点云演员
     actor = vtkSmartPointer<vtkActor>::New();
@@ -597,6 +601,9 @@ void MainWindow::showPointCloud()
     // 清空插入的顶点
     vertices->Reset();
 
+    // 清空标量值
+    scalars->Initialize();
+
     // 插入顶点 创建一个包含单个顶点的单元，并将点云数据中的每个点与这些单元关联起来，从而定义了点云数据的拓扑结构
     for (int i = 0; i < points->GetNumberOfPoints(); i++)
     {      
@@ -609,16 +616,24 @@ void MainWindow::showPointCloud()
         vertices->InsertNextCell(1);
         // 将点的索引 i 添加到刚刚插入的单元中。这样就将点云数据中的每个点与一个单元关联起来了。
         vertices->InsertCellPoint(i);
+
+        // 设置顶点的标量值
+        scalars->InsertTuple1(i,  i);
     }
 
     // 假设 vertices 已经被改变
     vertices->Modified(); // 标记 vertices 数据已经被修改
 
+    // 将标量属性设置到点云
+    polyData->GetPointData()->SetScalars(scalars);
+
+    mapper->SetScalarRange(0, polyData->GetNumberOfPoints());
+    mapper->Modified(); // 假设 mapper 已经被改变
+
     // 根据点云数据自适应地设置相机位置和视角
     renderer->ResetCamera();
 
     marker->SetEnabled(1); // 启用坐标系标记
-    marker->InteractiveOn(); // 启用或激活交互功能。当交互功能被启用时，用户可以使用鼠标来旋转、缩放和平移坐标轴
 
     // 刷新渲染窗口以显示新的点云数据
     renderWindow->Render();

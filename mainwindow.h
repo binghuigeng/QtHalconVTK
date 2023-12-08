@@ -18,6 +18,7 @@
 // VTK headers
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
+#include <vtkPointData.h>
 #include <vtkCellArray.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkPolyData.h>
@@ -190,6 +191,7 @@ private:
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> style; // 交互器样式
     vtkSmartPointer<vtkMatrix4x4> matrix;
     vtkSmartPointer<vtkTransform> transform;
-    vtkSmartPointer<vtkFloatArray> scalars;
+    vtkSmartPointer<vtkFloatArray> scalars; // 标量数据
+    vtkSmartPointer<vtkLookupTable> lut; // 颜色映射
 };
 #endif // MAINWINDOW_H
