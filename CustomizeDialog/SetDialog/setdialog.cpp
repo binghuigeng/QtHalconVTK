@@ -41,6 +41,9 @@ void SetDialog::setControlShow(bool windowTop, bool windowInquiry, int index)
     case SysConfig::Gray:
         ui->rdoGray->setChecked(true);
         break;
+    case SysConfig::DarkBlue:
+        ui->rdoDarkBlue->setChecked(true);
+        break;
     default:
         ui->rdoDefault->setChecked(true);
         break;
@@ -85,6 +88,12 @@ void SetDialog::slt_rdoGray_clicked()
     emit sigRendererBackground(SysConfig::Gray);
 }
 
+void SetDialog::slt_rdoDarkBlue_clicked()
+{
+    SysConfig::setRendererBackground(SysConfig::DarkBlue);
+    emit sigRendererBackground(SysConfig::DarkBlue);
+}
+
 void SetDialog::initial()
 {
     // 设置窗口标志位 隐藏窗口的最小化和最大化按钮，以及窗口置顶
@@ -94,11 +103,6 @@ void SetDialog::initial()
 
     // 设置窗口标题
     this->setWindowTitle("设置"); // 设置窗口标志位 窗口置顶
-
-//    // 主体
-//    ui->widgetBody->setFont(QFont("Microsoft YaHei UI", 10)); //设置字体
-//    ui->lbAPPVersion->setAlignment(Qt::AlignCenter); //居中对齐
-//    ui->lbAPP->setText(TOSTRING(PROJECT_VERSION)); //APP版本
 
 //    // 关闭按钮
 //    ui->btnClose->setText("关闭");
@@ -114,4 +118,5 @@ void SetDialog::initSignalAndSlot()
     connect(ui->rdoDefault, &QRadioButton::clicked, this, &SetDialog::slt_rdoDefault_clicked);
     connect(ui->rdoBlack, &QRadioButton::clicked, this, &SetDialog::slt_rdoBlack_clicked);
     connect(ui->rdoGray, &QRadioButton::clicked, this, &SetDialog::slt_rdoGray_clicked);
+    connect(ui->rdoDarkBlue, &QRadioButton::clicked, this, &SetDialog::slt_rdoDarkBlue_clicked);
 }

@@ -18,7 +18,8 @@ public:
     enum RendererBackground {
         Default,
         Black,
-        Gray
+        Gray,
+        DarkBlue
     };
 
     /// @brief 设置窗口置顶
@@ -38,12 +39,12 @@ public:
     static bool getWindowClose();
 
     /// @brief 设置渲染背景
-    /// @param index Default:默认 Black:黑色 Gray:灰色
+    /// @param index Default:默认 Black:黑色 Gray:灰色 DarkBlue:深蓝色
     static void setRendererBackground(SysConfig::RendererBackground index);
 
     /// @brief 获取渲染背景
-    /// @return Default:默认 Black:黑色 Gray:灰色
-    static int getRendererBackground();
+    /// @return Default:默认 Black:黑色 Gray:灰色 DarkBlue:深蓝色
+    static RendererBackground getRendererBackground();
 };
 
 #endif // SYSCONFIG_H

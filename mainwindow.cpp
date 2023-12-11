@@ -126,21 +126,7 @@ void MainWindow::sltWindowOnTop()
 
 void MainWindow::sltRendererBackground(SysConfig::RendererBackground index)
 {
-    // 设置渲染器背景颜色
-    switch (index) {
-    case SysConfig::Default:
-        renderer->SetBackground(0.1, 0.2, 0.4); // 深蓝色
-        break;
-    case SysConfig::Black:
-        renderer->SetBackground(0.0, 0.0, 0.0); // 黑色
-        break;
-    case SysConfig::Gray:
-        renderer->SetBackground(0.5, 0.5, 0.5); // 灰色
-        break;
-    default:
-        renderer->SetBackground(0.1, 0.2, 0.4); // 深蓝色
-        break;
-    }
+    setRendererBackground(index); // 设置渲染器背景颜色
     renderWindow->Render(); // 刷新渲染窗口
 }
 
@@ -426,7 +412,7 @@ void MainWindow::initVTK()
     renderer = vtkSmartPointer<vtkRenderer>::New();
     renderer->AddActor(actor);
     renderer->AddActor(scalarBar); // 将标量条添加到渲染器中
-//    renderer->SetBackground(0.1, 0.2, 0.4); // 设置渲染器背景颜色
+//    renderer->SetBackground(0.2, 0.3, 0.4); // 设置渲染器背景颜色
     setRendererBackground(SysConfig::getRendererBackground()); // 依据配置文件设置渲染器背景颜色
 
     // 创建渲染窗口
@@ -492,21 +478,24 @@ void MainWindow::initSignalsAndSlots()
     connect(&dlgSet, &SetDialog::sigRendererBackground, this, &MainWindow::sltRendererBackground);
 }
 
-void MainWindow::setRendererBackground(int index)
+void MainWindow::setRendererBackground(SysConfig::RendererBackground index)
 {
     // 设置渲染器背景颜色
     switch (index) {
-    case 0:
-        renderer->SetBackground(0.1, 0.2, 0.4); // 深蓝色
+    case SysConfig::Default:
+        renderer->SetBackground(0.2, 0.3, 0.4); // 深灰色
         break;
-    case 1:
+    case SysConfig::Black:
         renderer->SetBackground(0.0, 0.0, 0.0); // 黑色
         break;
-    case 2:
+    case SysConfig::Gray:
         renderer->SetBackground(0.5, 0.5, 0.5); // 灰色
         break;
-    default:
+    case SysConfig::DarkBlue:
         renderer->SetBackground(0.1, 0.2, 0.4); // 深蓝色
+        break;
+    default:
+        renderer->SetBackground(0.2, 0.3, 0.4); // 深灰色
         break;
     }
 }

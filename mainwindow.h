@@ -61,7 +61,7 @@ public slots:
     void sltWindowOnTop();
 
     /// @brief 渲染背景
-    /// @param index Default:默认 Black:黑色 Gray:灰色
+    /// @param index Default:默认 Black:黑色 Gray:灰色 DarkBlue:深蓝色
     void sltRendererBackground(SysConfig::RendererBackground index);
 
 private slots:
@@ -114,7 +114,8 @@ private:
     void initSignalsAndSlots();
 
     /// @brief 渲染背景
-    void setRendererBackground(int index);
+    /// @param index Default:默认 Black:黑色 Gray:灰色 DarkBlue:深蓝色
+    void setRendererBackground(SysConfig::RendererBackground index);
 
     /// @brief 加载点云文件
     /// @return true:成功 false:失败

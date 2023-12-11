@@ -41,8 +41,8 @@ void SysConfig::setRendererBackground(SysConfig::RendererBackground index)
     configIniWrite.setValue("/Universal/RendererBackground", index);
 }
 
-int SysConfig::getRendererBackground()
+SysConfig::RendererBackground SysConfig::getRendererBackground()
 {
     QSettings configIniRead("./Config/config.ini", QSettings::IniFormat);
-    return configIniRead.value("/Universal/RendererBackground", SysConfig::Default).toInt();
+    return static_cast<RendererBackground>(configIniRead.value("/Universal/RendererBackground", SysConfig::Default).toInt());
 }

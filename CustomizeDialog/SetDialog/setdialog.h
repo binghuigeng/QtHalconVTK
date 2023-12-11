@@ -54,6 +54,9 @@ private slots:
     /// @brief 白色渲染背景
     void slt_rdoGray_clicked();
 
+    /// @brief 深蓝色渲染背景
+    void slt_rdoDarkBlue_clicked();
+
 private:
     Ui::SetDialog *ui;
 
