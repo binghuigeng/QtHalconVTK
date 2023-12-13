@@ -29,14 +29,15 @@ endif()
 configure_file(${CMAKE_SOURCE_DIR}/Config/ProjectConfig.h.in ProjectConfig.h)
 
 # VTK
-find_package(VTK COMPONENTS
-    vtkCommonCore
-    vtkGUISupportQt
-    vtkGUISupportQtOpenGL
-    vtkRenderingOpenGL2
-    vtkIOImage
-    vtkInteractionImage
-)
+#find_package(VTK COMPONENTS
+#    vtkCommonCore
+#    vtkGUISupportQt
+#    vtkGUISupportQtOpenGL
+#    vtkRenderingOpenGL2
+#    vtkIOImage
+#    vtkInteractionImage
+#)
+find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
 if("${VTK_QT_VERSION}" STREQUAL "")

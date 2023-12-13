@@ -107,6 +107,9 @@ private:
     /// @brief 初始化状态栏显示消息
     void initStatusbarMessage();
 
+    /// @brief 初始化坐标轴的最小最大值
+    void initAxisMinMax();
+
     /// @brief 初始化 VTK
     void initVTK();
 
@@ -164,6 +167,12 @@ private:
     QPushButton *btnReject;
     QCheckBox chkInquiry;
     bool bAcceptClose;
+
+    /// @brief 轴的最小值
+    double minAxis;
+
+    /// @brief 轴的最大值
+    double maxAxis;
 
     // HALCON variables
     HalconCpp::HObjectModel3D model3D;

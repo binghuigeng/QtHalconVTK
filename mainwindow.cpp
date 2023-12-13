@@ -172,6 +172,8 @@ void MainWindow::slt_actReset_triggered()
 
 void MainWindow::slt_actAdd_triggered()
 {
+    initAxisMinMax(); // 初始化坐标轴的最小最大值
+
     // 清空插入的点
     points->Reset();
 
@@ -189,6 +191,7 @@ void MainWindow::slt_actAdd_triggered()
 
     // 清空标量值
     scalars->Initialize();
+    scalars->SetNumberOfTuples(points->GetNumberOfPoints());
 
     // 插入顶点 创建一个包含单个顶点的单元，并将点云数据中的每个点与这些单元关联起来，从而定义了点云数据的拓扑结构
     for (int i = 0; i < points->GetNumberOfPoints(); i++)
@@ -203,18 +206,25 @@ void MainWindow::slt_actAdd_triggered()
         // 将点的索引 i 添加到刚刚插入的单元中。这样就将点云数据中的每个点与一个单元关联起来了。
         vertices->InsertCellPoint(i);
 
-        // 设置顶点的标量值
-        scalars->InsertTuple1(i,  i);
+        scalars->SetValue(i, points->GetPoint(i)[2]);  // 将 z 值设置为标量值
+
+        // 轴的最大值
+        if (points->GetPoint(i)[2] > maxAxis) {
+            maxAxis = points->GetPoint(i)[2];
+        }
+
+        // 过滤轴的最小值
+        if (points->GetPoint(i)[2] == 0.000000) {
+            continue;
+        }
+
+        // 轴的最小值
+        if (points->GetPoint(i)[2] < minAxis) {
+            minAxis = points->GetPoint(i)[2];
+        }
     }
 
-    // 假设 vertices 已经被改变
-    vertices->Modified(); // 标记 vertices 数据已经被修改
-
-    // 将标量属性设置到点云
-    polyData->GetPointData()->SetScalars(scalars);
-
-    mapper->SetScalarRange(0, polyData->GetNumberOfPoints());
-    mapper->Modified(); // 假设 mapper 已经被改变
+    mapper->SetScalarRange(minAxis, maxAxis);
 
     // 根据点云数据自适应地设置相机位置和视角
     renderer->ResetCamera();
@@ -224,7 +234,6 @@ void MainWindow::slt_actAdd_triggered()
 
     // 刷新渲染窗口以显示新的点云数据
     renderWindow->Render();
-    renderWindowInteractor->GetInteractor()->Render();
 }
 
 void MainWindow::slt_actRestart_triggered()
@@ -344,8 +353,16 @@ void MainWindow::initStatusbarMessage()
     ui->statusbar->addWidget(&statusLabel, 1);
 }
 
+void MainWindow::initAxisMinMax()
+{
+    minAxis = (std::numeric_limits<double>::max)();
+    maxAxis = (std::numeric_limits<double>::min)();
+}
+
 void MainWindow::initVTK()
 {
+    initAxisMinMax(); // 初始化坐标轴的最小最大值
+
     // 创建点云数据
     points = vtkSmartPointer<vtkPoints>::New();
 //    points->InsertNextPoint(0, 0, 0); // 添加点坐标
@@ -358,13 +375,29 @@ void MainWindow::initVTK()
 
     // 创建标量数据
     scalars = vtkSmartPointer<vtkFloatArray>::New();
+    scalars->SetNumberOfComponents(1);
+    scalars->SetNumberOfTuples(points->GetNumberOfPoints());
     for (vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
     {
         vertices->InsertNextCell(1);
         vertices->InsertCellPoint(i);
 
-        // 设置顶点的标量值
-        scalars->InsertTuple1(i,  i);
+        scalars->SetValue(i, points->GetPoint(i)[2]);  // 将 z 值设置为标量值
+
+        // 轴的最大值
+        if (points->GetPoint(i)[2] > maxAxis) {
+            maxAxis = points->GetPoint(i)[2];
+        }
+
+        // 过滤轴的最小值
+        if (points->GetPoint(i)[2] == 0.000000) {
+            continue;
+        }
+
+        // 轴的最小值
+        if (points->GetPoint(i)[2] < minAxis) {
+            minAxis = points->GetPoint(i)[2];
+        }
     }
 
     // 创建多边形数据
@@ -387,7 +420,7 @@ void MainWindow::initVTK()
     // 创建点云映射器
     mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInputConnection(vertexFilter->GetOutputPort());
-    mapper->SetScalarRange(0, polyData->GetNumberOfPoints());
+    mapper->SetScalarRange(minAxis, maxAxis);
     mapper->SetLookupTable(lut);
 
     // 创建点云演员
@@ -597,6 +630,8 @@ void MainWindow::showPointCloudFile(QString fileName)
 
 void MainWindow::showPointCloud()
 {
+    initAxisMinMax(); // 初始化坐标轴的最小最大值
+
     // 清空插入的点
     points->Reset();
 
@@ -616,8 +651,9 @@ void MainWindow::showPointCloud()
     scalars->Initialize();
 
     // 插入顶点 创建一个包含单个顶点的单元，并将点云数据中的每个点与这些单元关联起来，从而定义了点云数据的拓扑结构
+    scalars->SetNumberOfTuples(points->GetNumberOfPoints());
     for (int i = 0; i < points->GetNumberOfPoints(); i++)
-    {      
+    {
         /********************************************************************************
         ** @brief 向 vtkCellArray 中插入一个新的单元
         **
@@ -628,18 +664,25 @@ void MainWindow::showPointCloud()
         // 将点的索引 i 添加到刚刚插入的单元中。这样就将点云数据中的每个点与一个单元关联起来了。
         vertices->InsertCellPoint(i);
 
-        // 设置顶点的标量值
-        scalars->InsertTuple1(i,  i);
+        scalars->SetValue(i, points->GetPoint(i)[2]);  // 将 z 值设置为标量值
+
+        // 轴的最大值
+        if (points->GetPoint(i)[2] > maxAxis) {
+            maxAxis = points->GetPoint(i)[2];
+        }
+
+        // 过滤轴的最小值
+        if (points->GetPoint(i)[2] == 0.000000) {
+            continue;
+        }
+
+        // 轴的最小值
+        if (points->GetPoint(i)[2] < minAxis) {
+            minAxis = points->GetPoint(i)[2];
+        }
     }
 
-    // 假设 vertices 已经被改变
-    vertices->Modified(); // 标记 vertices 数据已经被修改
-
-    // 将标量属性设置到点云
-    polyData->GetPointData()->SetScalars(scalars);
-
-    mapper->SetScalarRange(0, polyData->GetNumberOfPoints());
-    mapper->Modified(); // 假设 mapper 已经被改变
+    mapper->SetScalarRange(minAxis, maxAxis);
 
     // 根据点云数据自适应地设置相机位置和视角
     renderer->ResetCamera();
