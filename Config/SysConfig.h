@@ -17,8 +17,8 @@ public:
     /// @brief 渲染背景
     enum RendererBackground {
         Default,
-        Black,
         Gray,
+        NavyBlue,
         DarkBlue
     };
 
@@ -39,11 +39,11 @@ public:
     static bool getWindowClose();
 
     /// @brief 设置渲染背景
-    /// @param index Default:默认 Black:黑色 Gray:灰色 DarkBlue:深蓝色
+    /// @param index Default:默认 Gray:灰色 NavyBlue:藏青色 DarkBlue:深蓝色
     static void setRendererBackground(SysConfig::RendererBackground index);
 
     /// @brief 获取渲染背景
-    /// @return Default:默认 Black:黑色 Gray:灰色 DarkBlue:深蓝色
+    /// @return Default:默认 Gray:灰色 NavyBlue:藏青色 DarkBlue:深蓝色
     static RendererBackground getRendererBackground();
 };
 

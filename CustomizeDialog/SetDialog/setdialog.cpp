@@ -35,11 +35,11 @@ void SetDialog::setControlShow(bool windowTop, bool windowInquiry, int index)
     case SysConfig::Default:
         ui->rdoDefault->setChecked(true);
         break;
-    case SysConfig::Black:
-        ui->rdoBlack->setChecked(true);
-        break;
     case SysConfig::Gray:
         ui->rdoGray->setChecked(true);
+        break;
+    case SysConfig::NavyBlue:
+        ui->rdoNavyBlue->setChecked(true);
         break;
     case SysConfig::DarkBlue:
         ui->rdoDarkBlue->setChecked(true);
@@ -76,16 +76,16 @@ void SetDialog::slt_rdoDefault_clicked()
     emit sigRendererBackground(SysConfig::Default);
 }
 
-void SetDialog::slt_rdoBlack_clicked()
-{
-    SysConfig::setRendererBackground(SysConfig::Black);
-    emit sigRendererBackground(SysConfig::Black);
-}
-
 void SetDialog::slt_rdoGray_clicked()
 {
     SysConfig::setRendererBackground(SysConfig::Gray);
     emit sigRendererBackground(SysConfig::Gray);
+}
+
+void SetDialog::slt_rdoNavyBlue_clicked()
+{
+    SysConfig::setRendererBackground(SysConfig::NavyBlue);
+    emit sigRendererBackground(SysConfig::NavyBlue);
 }
 
 void SetDialog::slt_rdoDarkBlue_clicked()
@@ -116,7 +116,7 @@ void SetDialog::initSignalAndSlot()
     connect(ui->chkInquiry, &QCheckBox::stateChanged, this, &SetDialog::slt_chkInquiry_stateChanged);
     // 渲染背景
     connect(ui->rdoDefault, &QRadioButton::clicked, this, &SetDialog::slt_rdoDefault_clicked);
-    connect(ui->rdoBlack, &QRadioButton::clicked, this, &SetDialog::slt_rdoBlack_clicked);
     connect(ui->rdoGray, &QRadioButton::clicked, this, &SetDialog::slt_rdoGray_clicked);
+    connect(ui->rdoNavyBlue, &QRadioButton::clicked, this, &SetDialog::slt_rdoNavyBlue_clicked);
     connect(ui->rdoDarkBlue, &QRadioButton::clicked, this, &SetDialog::slt_rdoDarkBlue_clicked);
 }

@@ -516,19 +516,19 @@ void MainWindow::setRendererBackground(SysConfig::RendererBackground index)
     // 设置渲染器背景颜色
     switch (index) {
     case SysConfig::Default:
-        renderer->SetBackground(0.2, 0.3, 0.4); // 深灰色
-        break;
-    case SysConfig::Black:
         renderer->SetBackground(0.0, 0.0, 0.0); // 黑色
         break;
     case SysConfig::Gray:
         renderer->SetBackground(0.5, 0.5, 0.5); // 灰色
         break;
+    case SysConfig::NavyBlue:
+        renderer->SetBackground(0.2, 0.3, 0.4); // 藏青色
+        break;
     case SysConfig::DarkBlue:
         renderer->SetBackground(0.1, 0.2, 0.4); // 深蓝色
         break;
     default:
-        renderer->SetBackground(0.2, 0.3, 0.4); // 深灰色
+        renderer->SetBackground(0.0, 0.0, 0.0); // 黑色
         break;
     }
 }

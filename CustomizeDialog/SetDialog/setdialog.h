@@ -48,11 +48,11 @@ private slots:
     /// @brief 默认渲染背景
     void slt_rdoDefault_clicked();
 
-    /// @brief 黑色渲染背景
-    void slt_rdoBlack_clicked();
-
-    /// @brief 白色渲染背景
+    /// @brief 灰色渲染背景
     void slt_rdoGray_clicked();
+
+    /// @brief 藏青色渲染背景
+    void slt_rdoNavyBlue_clicked();
 
     /// @brief 深蓝色渲染背景
     void slt_rdoDarkBlue_clicked();
